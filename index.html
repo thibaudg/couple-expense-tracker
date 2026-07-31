@@ -90,16 +90,30 @@
     font-size:14px;font-weight:600;color:var(--sub);display:flex;align-items:center;justify-content:center;gap:6px;}
   .seg .opt svg{width:15px;height:15px;}
   .seg .opt.on{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-line);}
-  .catgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px 16px 4px;}
-  .cat{text-align:center;padding:10px 2px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--txt);}
-  .cat.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent);}
-  .cat svg{width:22px;height:22px;}
-  .cat .n{font-size:10.5px;color:var(--sub);margin-top:4px;line-height:1.15;}
-  .cat.on .n{color:var(--accent);}
-  .savebtn{margin:10px 16px 4px;padding:16px;border-radius:14px;background:var(--accent);border:0;
+  .catgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:6px 16px 4px;}
+  .cat{text-align:center;padding:9px 2px;border-radius:12px;border:1.5px solid transparent;cursor:pointer;}
+  .cat svg{width:21px;height:21px;color:var(--txt);}
+  .cat .n{font-size:10.5px;color:var(--sub);margin-top:3px;line-height:1.1;font-weight:600;}
+  /* pill row: Paid by · Split · Date (same height) */
+  .pillrow{display:flex;gap:8px;padding:8px 16px 2px;}
+  .cpill{flex:1;min-width:0;height:42px;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--card);
+    border:1px solid var(--line);border-radius:22px;padding:0 12px;font-size:13px;font-weight:700;color:var(--txt);cursor:pointer;}
+  .cpill .plab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .cpill .chev{color:var(--muted);font-size:12px;flex:0 0 auto;}
+  .cpill svg{width:15px;height:15px;color:var(--sub);flex:0 0 auto;}
+  .cpill.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent);}
+  .datepill{position:relative;flex:0 0 auto;}
+  .datepill input[type=date]{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;margin:0;padding:0;cursor:pointer;-webkit-appearance:none;appearance:none;}
+  /* split dropdown options */
+  .split-panel{padding:6px 16px 2px;}
+  .sopt{padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:6px;
+    font-size:14px;font-weight:600;color:var(--txt);cursor:pointer;}
+  .sopt.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent);}
+  .savebtn{margin:12px 16px 2px;padding:16px;border-radius:14px;background:var(--accent);border:0;
     color:#fff;font-size:17px;font-weight:700;width:calc(100% - 32px);display:flex;align-items:center;justify-content:center;gap:8px;}
   .savebtn svg{width:18px;height:18px;color:#fff;stroke-width:2.2;}
   .savebtn:disabled{opacity:.4;}
+  .cancel-add{display:block;margin:2px auto 0;background:0;border:0;color:var(--sub);font-size:14px;font-weight:600;padding:9px 16px;cursor:pointer;}
   /* custom split row */
   .customrow{display:flex;gap:8px;padding:8px 16px 2px;}
   .customrow .cs{flex:1;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;}
@@ -118,6 +132,9 @@
   .ebtn{flex:1;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-size:15px;font-weight:700;color:var(--txt);}
   .ebtn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
   .ebtn.danger{color:#c0392b;}
+  .edit-del{border-top:1px solid var(--line);margin:12px 16px 0;padding-top:12px;text-align:center;}
+  .dellink{background:0;border:0;color:#c0392b;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;cursor:pointer;}
+  .dellink svg{width:15px;height:15px;stroke:#c0392b;}
   /* balance bar (in expenses) */
   .balbar{padding:0 16px 8px;}
   .balbtn{width:100%;display:flex;align-items:center;justify-content:space-between;background:var(--accent-soft);
@@ -163,6 +180,8 @@
     color:#fff;font-weight:700;font-size:14px;padding:11px 18px;border-radius:22px;opacity:0;
     transition:opacity .2s;z-index:50;pointer-events:none;}
   .toast.show{opacity:1;}
+  .toast.act{pointer-events:auto;display:inline-flex;align-items:center;gap:14px;}
+  .toast .undo{background:0;border:0;color:#8fbaff;font-weight:800;font-size:14px;cursor:pointer;}
   .link{background:0;border:0;color:var(--accent);font-size:13px;font-weight:600;}
   /* login */
   .login{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;}
@@ -201,7 +220,6 @@
       <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
     </button>
     <div class="appbar-right">
-      <div class="datebtn hidden" id="date-chip"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9h16M8 3v4M16 3v4"/></svg><span id="date-label">Today</span><input type="date" id="date-input" aria-label="Expense date" onchange="onDateChange()"></div>
       <button class="whoami hidden" id="whoami" onclick="toggleMe()"><span class="dot"></span><span id="me-name">Thibaud</span></button>
     </div>
   </header>
@@ -210,38 +228,27 @@
   <section id="view-add">
     <div class="amount-wrap"><span class="cur">$</span><input id="amt-input" class="amount-input" inputmode="decimal" enterkeyhint="next" placeholder="0" autocomplete="off"></div>
 
-    <div id="shared-controls">
-      <div class="seg-lbl">Type</div>
-      <div class="seg" id="seg-type">
-        <div class="opt on" data-v="expense" onclick="setType('expense')">Expense</div>
-        <div class="opt" data-v="transfer" onclick="setType('transfer')">Transfer</div>
-      </div>
-      <div id="expense-fields">
-        <div class="seg-lbl">Paid by</div>
-        <div class="seg" id="seg-paid"></div>
-        <div class="seg-lbl">Split</div>
-        <div class="seg" id="seg-split">
-          <div class="opt" data-v="ours" onclick="setSplit('ours')">50 / 50</div>
-          <div class="opt" data-v="custom" onclick="setSplit('custom')">Custom</div>
-          <div class="opt" data-v="mine" onclick="setSplit('mine')">Just payer</div>
-        </div>
-        <div class="customrow hidden" id="custom-split"></div>
-      </div>
-      <div id="transfer-fields" class="hidden">
-        <div class="seg-lbl">Direction</div>
-        <div class="seg" id="seg-transfer"></div>
-      </div>
-    </div>
+    <div class="namewrap"><input id="name-input" class="nameinput" enterkeyhint="done" placeholder="What was it? — e.g. Nofrills" autocomplete="off"></div>
 
     <div id="category-block">
-      <div class="seg-lbl">Category</div>
       <div class="catgrid" id="catgrid"></div>
     </div>
 
-    <div class="seg-lbl">Name</div>
-    <div class="namewrap"><input id="name-input" class="nameinput" enterkeyhint="done" placeholder="Name — e.g. Nofrills" autocomplete="off"></div>
+    <div class="pillrow" id="pillrow">
+      <button class="cpill hidden" id="paid-pill" onclick="cyclePaid()"></button>
+      <button class="cpill hidden" id="split-pill" onclick="toggleSplitPanel()"></button>
+      <div class="cpill datepill" id="date-pill"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9h16M8 3v4M16 3v4"/></svg><span class="plab" id="date-label">Today</span><input type="date" id="date-input" aria-label="Expense date" onchange="onDateChange()"></div>
+    </div>
+    <div class="split-panel hidden" id="split-panel">
+      <div class="sopt" data-v="ours" onclick="pickSplit('ours')">50 / 50</div>
+      <div class="sopt" data-v="mine" onclick="pickSplit('mine')">Just the payer</div>
+      <div class="sopt" data-v="custom" onclick="pickSplit('custom')">Custom split…</div>
+      <div class="sopt" data-v="transfer" onclick="pickSplit('transfer')">⇄ Transfer (settle up)</div>
+      <div class="customrow hidden" id="custom-split"></div>
+    </div>
 
     <button class="savebtn" id="savebtn" onclick="save()"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11"/></svg><span id="save-label">Save expense</span></button>
+    <button class="cancel-add" onclick="cancelAdd()">Cancel</button>
   </section>
 
   <!-- ============ EXPENSES LIST ============ -->
@@ -299,6 +306,14 @@ const IC={
 };
 function svg(cat){return '<svg viewBox="0 0 24 24">'+(IC[cat]||IC['Other'])+'</svg>';}
 const CATS=['Groceries','Restaurants & Bars','Cafe','Shopping','Transport','Rent & Charges','Accommodation','Entertainment','Healthcare','Insurance','Internet','Electricity','Other'];
+const CATCOLOR={
+ 'Groceries':['#e8f4e2','#d6ecca','#4c7a2a'],'Restaurants & Bars':['#fbe9e2','#f6d5c8','#b5552f'],
+ 'Cafe':['#f6edda','#eeddb8','#8a6412'],'Shopping':['#fbe7f0','#f6cfe0','#a5426f'],
+ 'Transport':['#e6f0fb','#cfe1f6','#2f6aad'],'Rent & Charges':['#ece9fb','#d9d3f5','#5a4fb0'],
+ 'Accommodation':['#e2f4ee','#c9ebdf','#1f8a68'],'Entertainment':['#f2e9fb','#e2cff6','#7a3fb0'],
+ 'Healthcare':['#fce9e9','#f6cccc','#b23b3b'],'Insurance':['#e9edfb','#d3dbf5','#3f4fa0'],
+ 'Internet':['#e2f2f6','#c9e6ee','#1f7d95'],'Electricity':['#faf1d6','#f3e3ad','#8a6b1a'],
+ 'Other':['#eeeee8','#deddd3','#6b6a63']};
 const BOOKICON={couple:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="16" cy="9" r="2.4"/><path d="M4 19c0-2.8 2.2-5 5-5s5 2.2 5 5M15 14c2.2 0 4 1.8 4 4"/></svg>',
  personal:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.5 3.1-6 7-6s7 2.5 7 6"/></svg>',
  work:'<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>'};
@@ -357,7 +372,6 @@ function renderAppbar(){
   const w=document.getElementById('whoami');
   if(view==='list'&&isShared()){w.classList.remove('hidden');document.getElementById('me-name').textContent=me;}
   else w.classList.add('hidden');
-  document.getElementById('date-chip').classList.toggle('hidden',view!=='add');
   document.getElementById('appbar').classList.toggle('hidden',view==='books');
 }
 
@@ -392,8 +406,9 @@ function renderList(){
     }
     const mine=(isShared()&&e.split==='mine')?`<span class="pill">${e.paidBy} only</span>`:'';
     const meta=isShared()?`Paid by ${e.paidBy} · ${e.cat}`:e.cat;
+    const cc=CATCOLOR[e.cat]||CATCOLOR['Other'];
     html+=`<div class="row" onclick="openEditor('${e.id}')">
-      <div class="ico">${svg(e.cat)}</div>
+      <div class="ico" style="background:${cc[0]};color:${cc[2]}">${svg(e.cat)}</div>
       <div class="rmid"><div class="rdesc">${escapeHtml(e.desc||e.cat)}${mine}</div><div class="rmeta">${meta}</div></div>
       <div class="ramt">${money(e.amount)}</div></div>`;
   });
@@ -431,9 +446,9 @@ function openEditor(id){
     </div>
     <div class="efield"><label>Name</label><input id="e-name" value="${escapeAttr(e.desc||'')}"></div>
     ${typeSel}${transferBlock}${expenseBlock}
-    <div class="ebtns"><button class="ebtn danger" onclick="deleteFromEditor('${id}')">Delete</button>
-      <button class="ebtn primary" onclick="saveEditor('${id}')">Save</button></div>
-    <button class="link" style="width:100%;padding:12px" onclick="closePicker()">Cancel</button></div>`;
+    <button class="ebtn primary" style="width:calc(100% - 32px);margin:12px 16px 2px" onclick="saveEditor('${id}')">Save</button>
+    <button class="link" style="width:100%;padding:10px" onclick="closePicker()">Cancel</button>
+    <div class="edit-del"><button class="dellink" onclick="deleteFromEditor('${id}')"><svg viewBox="0 0 24 24" style="fill:none;stroke-linecap:round;stroke-linejoin:round"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>Delete ${isTr?'transfer':'expense'}</button></div></div>`;
   const bg=document.createElement('div');bg.className='sheet-bg';bg.id='picker';bg.innerHTML=html;
   bg.onclick=ev=>{if(ev.target===bg)closePicker();};
   document.body.appendChild(bg);
@@ -478,11 +493,20 @@ function saveEditor(id){
   }
   persist();if(CLOUD)cloudUpsertExpense(e);closePicker();renderAll();toast('Updated');
 }
+let lastDeleted=null;
 function deleteFromEditor(id){
-  const b=book();const e=b.items.find(x=>x.id===id);if(!e)return;
-  if(confirm(`Delete "${e.desc||e.cat}" (${money(e.amount)})?`)){
-    b.items=b.items.filter(x=>x.id!==id);persist();if(CLOUD)cloudDeleteExpense(id);closePicker();renderAll();
-  }
+  const b=book();const idx=b.items.findIndex(x=>x.id===id);if(idx<0)return;
+  lastDeleted={bookId:b.id,item:b.items[idx]};
+  b.items.splice(idx,1);persist();if(CLOUD)cloudDeleteExpense(id);closePicker();renderAll();
+  toastUndo('Deleted');
+}
+function undoDelete(){
+  if(!lastDeleted)return;
+  const b=books.find(x=>x.id===lastDeleted.bookId);
+  if(b){b.items.push(lastDeleted.item);persist();if(CLOUD)cloudInsertExpense(lastDeleted.item,b.id);}
+  lastDeleted=null;
+  const t=document.getElementById('toast');t.classList.remove('show','act');
+  renderAll();
 }
 
 /* ---------- balances ---------- */
@@ -507,6 +531,7 @@ function renderBal(){
 function newDraft(){
   const iso=new Date().toISOString().slice(0,10);
   draft={kind:'expense',cat:'Groceries',paidBy:me,split:'ours',date:iso,isToday:true,customShare:null,from:null,to:null};
+  splitPanelOpen=false;
   const ai=document.getElementById('amt-input');if(ai)ai.value='';
   const ni=document.getElementById('name-input');if(ni)ni.value='';
 }
@@ -515,47 +540,57 @@ function amountVal(){const ai=document.getElementById('amt-input');return ai?par
 function updateSaveState(){document.getElementById('savebtn').disabled=!(amountVal()>0);}
 function focusAmount(){const ai=document.getElementById('amt-input');if(ai)ai.focus();}
 function renderCatGrid(){
-  document.getElementById('catgrid').innerHTML=CATS.map(n=>
-    `<div class="cat${draft.cat===n?' on':''}" onclick="setCat(this.dataset.c)" data-c="${escapeHtml(n)}">${svg(n)}<div class="n">${n}</div></div>`).join('');
+  document.getElementById('catgrid').innerHTML=CATS.map(n=>{
+    const on=draft.cat===n, c=CATCOLOR[n]||CATCOLOR['Other'];
+    const style=`background:${on?c[1]:c[0]};border-color:${on?c[2]:'transparent'};`;
+    const nstyle=on?` style="color:${c[2]}"`:'';
+    return `<div class="cat${on?' on':''}" style="${style}" onclick="setCat(this.dataset.c)" data-c="${escapeHtml(n)}">${svg(n)}<div class="n"${nstyle}>${n}</div></div>`;
+  }).join('');
 }
-function renderPaidSeg(){
-  const M=book().members;
-  document.getElementById('seg-paid').innerHTML=M.map(m=>
-    `<div class="opt${draft.paidBy===m?' on':''}" onclick="setPaid('${m}')">${m}</div>`).join('');
+let splitPanelOpen=false;
+function splitLabel(s){return s==='ours'?'50 / 50':s==='mine'?'Just '+draft.paidBy:'Custom';}
+function renderPills(){
+  const isTransfer=isShared()&&draft.kind==='transfer';
+  document.getElementById('paid-pill').innerHTML=`<span class="plab">${isTransfer?'From · '+draft.from:'Paid · '+draft.paidBy}</span><span class="chev">▾</span>`;
+  document.getElementById('split-pill').innerHTML=`<span class="plab">${isTransfer?'⇄ Transfer':splitLabel(draft.split)}</span><span class="chev">▾</span>`;
 }
-function renderTransferSeg(){
-  const M=book().members;
-  document.getElementById('seg-transfer').innerHTML=[[M[0],M[1]],[M[1],M[0]]].map(([f,t])=>
-    `<div class="opt${draft.from===f?' on':''}" onclick="setDir('${f}','${t}')">${f} → ${t}</div>`).join('');
+function toggleSplitPanel(){splitPanelOpen=!splitPanelOpen;renderDraft();}
+function cyclePaid(){
+  if(isShared()&&draft.kind==='transfer'){draft.from=otherMember(draft.from);draft.to=otherMember(draft.from);}
+  else draft.paidBy=otherMember(draft.paidBy);
+  renderDraft();
+}
+function pickSplit(v){
+  if(v==='transfer'){draft.kind='transfer';if(!draft.from){draft.from=draft.paidBy||me;draft.to=otherMember(draft.from);}splitPanelOpen=false;}
+  else{draft.kind='expense';draft.split=v;if(v==='custom'){if(draft.customShare==null)draft.customShare=+((amountVal()||0)/2).toFixed(2);splitPanelOpen=true;}else splitPanelOpen=false;}
+  renderDraft();
 }
 function renderDraft(){
   const shared=isShared();
-  document.getElementById('shared-controls').classList.toggle('hidden',!shared);
-  const isTransfer = shared && draft.kind==='transfer';
-  // type toggle state
-  if(shared){document.querySelectorAll('#seg-type .opt').forEach(o=>o.classList.toggle('on',o.dataset.v===draft.kind));}
-  document.getElementById('expense-fields').classList.toggle('hidden',isTransfer);
-  document.getElementById('transfer-fields').classList.toggle('hidden',!isTransfer);
+  const isTransfer=shared&&draft.kind==='transfer';
+  document.getElementById('paid-pill').classList.toggle('hidden',!shared);
+  document.getElementById('split-pill').classList.toggle('hidden',!shared);
   document.getElementById('category-block').classList.toggle('hidden',isTransfer);
   const cs=document.getElementById('custom-split');
-  if(isTransfer){
-    if(!draft.from){draft.from=me;draft.to=otherMember(me);}
-    renderTransferSeg();
-    cs.classList.add('hidden');
-  }else if(shared){
-    renderPaidSeg();
-    document.querySelectorAll('#seg-split .opt').forEach(o=>o.classList.toggle('on',o.dataset.v===draft.split));
-    if(draft.split==='custom'){cs.classList.remove('hidden');renderCustomRow();}
+  const panel=document.getElementById('split-panel');
+  if(shared){
+    if(isTransfer&&!draft.from){draft.from=me;draft.to=otherMember(me);}
+    renderPills();
+    panel.classList.toggle('hidden',!splitPanelOpen);
+    document.querySelectorAll('#split-panel .sopt').forEach(o=>{
+      const on=(o.dataset.v==='transfer')?isTransfer:(!isTransfer&&o.dataset.v===draft.split);
+      o.classList.toggle('on',on);
+    });
+    if(splitPanelOpen&&!isTransfer&&draft.split==='custom'){cs.classList.remove('hidden');renderCustomRow();}
     else cs.classList.add('hidden');
-  }else cs.classList.add('hidden');
+  }else{cs.classList.add('hidden');panel.classList.add('hidden');}
   document.getElementById('save-label').textContent=isTransfer?'Save transfer':'Save expense';
   document.getElementById('date-label').textContent=draft.isToday?'Today':fmtDay(draft.date);
   const di=document.getElementById('date-input');if(di)di.value=draft.date;
   renderCatGrid();
   updateSaveState();
 }
-function setType(t){draft.kind=t;renderDraft();}
-function setDir(f,t){draft.from=f;draft.to=t;renderDraft();}
+function cancelAdd(){go('list');}
 function renderCustomRow(){
   const M=book().members,amt=amountVal()||0;
   const s0=draft.customShare!=null?draft.customShare:+(amt/2).toFixed(2);
@@ -576,7 +611,7 @@ function updateCustomRem(){
 }
 function setCat(c){draft.cat=c;renderDraft();}
 function setPaid(p){draft.paidBy=p;renderDraft();}
-function setSplit(s){draft.split=s;if(s==='custom'&&draft.customShare==null)draft.customShare=+((amountVal()||0)/2).toFixed(2);renderDraft();}
+function setSplit(s){draft.split=s;if(s==='custom'){if(draft.customShare==null)draft.customShare=+((amountVal()||0)/2).toFixed(2);splitPanelOpen=true;}else{splitPanelOpen=false;}renderDraft();}
 function onDateChange(){
   const v=document.getElementById('date-input').value;if(!v)return;
   draft.date=v;draft.isToday=(v===new Date().toISOString().slice(0,10));
@@ -621,7 +656,14 @@ function openPicker(){
   document.body.appendChild(bg);
 }
 function closePicker(){const p=document.getElementById('picker');if(p)p.remove();}
-function chooseBook(id){curId=id;me=book().members[0];saveCur();closePicker();newDraft();renderAll();renderDraft();}
+function chooseBook(id){
+  curId=id;me=book().members[0];saveCur();closePicker();
+  // keep the typed amount/name; only fix fields the new book invalidates
+  if(!book().members.includes(draft.paidBy))draft.paidBy=me;
+  if(draft.from&&!book().members.includes(draft.from)){draft.from=null;draft.to=null;}
+  if(!isShared())draft.kind='expense';
+  renderAll();renderDraft();updateSaveState();
+}
 function chooseBookGo(id){chooseBook(id);go('list');}
 
 /* ---------- books page ---------- */
@@ -681,7 +723,8 @@ function go(v){
   renderAppbar();window.scrollTo(0,0);
 }
 function toggleMe(){const M=book().members;me=me===M[0]?M[1]:M[0];document.getElementById('me-name').textContent=me;renderList();}
-function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1400);}
+function toast(m){const t=document.getElementById('toast');t.classList.remove('act');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1400);}
+function toastUndo(msg){const t=document.getElementById('toast');t.innerHTML=`${msg} <button class="undo" onclick="undoDelete()">Undo</button>`;t.classList.add('show','act');clearTimeout(t._t);t._t=setTimeout(()=>{t.classList.remove('show','act');t.textContent='Saved';lastDeleted=null;},4500);}
 function renderAll(){renderAppbar();if(view==='list')renderList();if(view==='bal')renderBal();if(view==='books')renderBooks();}
 
 document.getElementById('amt-input').addEventListener('input',function(){
