@@ -194,6 +194,66 @@
   .login button{width:100%;padding:14px;border-radius:12px;background:var(--accent);border:0;color:#fff;font-size:16px;font-weight:700;}
   .login button:disabled{opacity:.5;}
   .login .err{color:#c0392b;font-size:13px;text-align:center;min-height:18px;margin-top:8px;}
+  /* icon buttons + search */
+  .iconbtn{width:38px;height:38px;border-radius:50%;background:var(--card);border:1px solid var(--line);color:var(--sub);
+    display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;}
+  .iconbtn svg{width:18px;height:18px;}
+  .iconbtn.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent);}
+  .searchbar{padding:0 16px 8px;}
+  .searchbar .box{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:10px 14px;}
+  .searchbar .box svg{width:16px;height:16px;color:var(--muted);flex:0 0 auto;}
+  .searchbar input{flex:1;border:0;outline:none;background:transparent;font-family:inherit;font-size:15px;color:var(--txt);min-width:0;}
+  .searchbar .clr{background:0;border:0;color:var(--muted);font-size:15px;cursor:pointer;padding:0 2px;flex:0 0 auto;}
+  .bookbadge{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;background:var(--card2);color:var(--sub);margin-left:6px;vertical-align:1px;}
+  /* book ⋮ menu rows */
+  .menurow{display:flex;align-items:center;gap:11px;padding:14px;background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);margin-bottom:8px;font-size:15px;font-weight:600;color:var(--txt);cursor:pointer;}
+  .menurow svg{width:19px;height:19px;color:var(--accent);}
+  /* insights */
+  .ins-head{display:flex;gap:8px;padding:4px 16px 10px;}
+  .inschip{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--card);
+    border:1px solid var(--line);border-radius:22px;padding:10px 12px;font-size:13.5px;font-weight:700;color:var(--txt);cursor:pointer;}
+  .inschip .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:0 0 auto;}
+  .inschip .lab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .inschip .chev{color:var(--muted);font-size:11px;flex:0 0 auto;}
+  .insseg{display:flex;gap:6px;padding:0 16px 12px;}
+  .insseg .opt{flex:1;text-align:center;padding:8px 0;border-radius:10px;background:var(--card);border:1px solid var(--line);
+    font-size:13px;font-weight:700;color:var(--sub);cursor:pointer;}
+  .insseg .opt.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent);}
+  .inscard{background:var(--card);border:1px solid var(--line);border-radius:16px;margin:0 16px 12px;padding:14px 16px;}
+  .insstep{display:flex;align-items:center;justify-content:center;gap:18px;padding-bottom:10px;}
+  .insstep .nav{width:30px;height:30px;border-radius:50%;background:var(--card2);border:0;color:var(--accent);font-size:16px;
+    font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;}
+  .insstep .nav:disabled{opacity:.3;}
+  .insstep .plabel{font-size:15px;font-weight:800;min-width:130px;text-align:center;}
+  .instot{display:flex;align-items:baseline;justify-content:space-between;}
+  .instot .big{font-size:25px;font-weight:800;letter-spacing:-.5px;}
+  .instot .delta{font-size:12px;font-weight:700;}
+  .instot .delta.down{color:var(--green);}
+  .instot .delta.up{color:#c0392b;}
+  .instot .delta.flat{color:var(--muted);}
+  .trend{display:flex;align-items:flex-end;justify-content:space-between;gap:6px;height:78px;margin-top:12px;}
+  .trend .tb{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;cursor:pointer;}
+  .trend .stack{width:100%;max-width:30px;border-radius:5px 5px 0 0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;}
+  .trend .stack .seg{display:block;width:100%;}
+  .trend .tl{font-size:10px;color:var(--muted);}
+  .trend .tb.sel .stack{box-shadow:0 0 0 2px var(--accent);}
+  .trend .tb.sel .tl{color:var(--accent);font-weight:800;}
+  .trendcap{text-align:center;font-size:10.5px;color:var(--muted);margin-top:9px;}
+  .inslegend{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;padding:0 16px 12px;}
+  .inslegend .lg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--sub);font-weight:600;}
+  .inslegend .sw{width:10px;height:10px;border-radius:3px;flex:0 0 auto;}
+  .inslabel{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;padding:2px 20px 7px;}
+  .catrow{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:11px 12px 11px 14px;margin:0 16px 6px;cursor:pointer;}
+  .catrow .cico{width:22px;height:22px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 22px;}
+  .catrow .cico svg{width:14px;height:14px;}
+  .catrow .cmid{flex:1;min-width:0;}
+  .catrow .ctop{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;}
+  .catrow .camt{font-weight:800;}
+  .catrow .cbar{height:5px;border-radius:3px;margin-top:5px;min-width:4px;}
+  .catrow .cchev{color:var(--muted);font-size:16px;flex:0 0 auto;}
+  .ins-empty{color:var(--muted);text-align:center;padding:36px 24px;font-size:14px;line-height:1.6;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -220,9 +280,16 @@
       <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
     </button>
     <div class="appbar-right">
+      <button class="iconbtn hidden" id="search-btn" onclick="toggleSearch()" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.4-3.4"/></svg></button>
+      <button class="iconbtn hidden" id="book-menu-btn" onclick="openBookMenu()" aria-label="Book options"><svg viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg></button>
       <button class="whoami hidden" id="whoami" onclick="toggleMe()"><span class="dot"></span><span id="me-name">Thibaud</span></button>
     </div>
   </header>
+
+  <div class="searchbar hidden" id="searchbar">
+    <div class="box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.4-3.4"/></svg>
+      <input id="search-input" placeholder="Search" autocomplete="off" oninput="onSearchInput()"><button class="clr" onclick="clearSearch()" aria-label="Clear">✕</button></div>
+  </div>
 
   <!-- ============ CAPTURE (default) ============ -->
   <section id="view-add">
@@ -248,7 +315,6 @@
     </div>
 
     <button class="savebtn" id="savebtn" onclick="save()"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11"/></svg><span id="save-label">Save expense</span></button>
-    <button class="cancel-add" onclick="cancelAdd()">Cancel</button>
   </section>
 
   <!-- ============ EXPENSES LIST ============ -->
@@ -267,15 +333,37 @@
 
   <!-- ============ BOOKS ============ -->
   <section id="view-books" class="hidden">
-    <div class="subhead" style="padding-top:6px"><span class="st">Your books</span></div>
+    <div class="subhead" style="padding-top:6px;justify-content:space-between"><span class="st">Your books</span>
+      <button class="iconbtn" id="books-search-btn" onclick="toggleSearch()" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.4-3.4"/></svg></button></div>
     <div class="bookslist" id="bookslist"></div>
     <div style="text-align:center;padding:20px 0 8px;"><button class="link" id="books-footer" onclick="resetDemo()">Reset demo data</button></div>
+  </section>
+
+  <!-- ============ INSIGHTS ============ -->
+  <section id="view-insights" class="hidden">
+    <div class="ins-head">
+      <button class="inschip" id="ins-person" onclick="openInsPerson()"><span class="dot"></span><span class="lab" id="ins-person-lab">Thibaud</span><span class="chev">▾</span></button>
+      <button class="inschip" id="ins-books" onclick="openInsBooks()"><span class="lab" id="ins-books-lab">All books</span><span class="chev">▾</span></button>
+    </div>
+    <div class="insseg" id="ins-scope">
+      <div class="opt on" data-s="month" onclick="setInsScope('month')">Month</div>
+      <div class="opt" data-s="year" onclick="setInsScope('year')">Year</div>
+      <div class="opt" data-s="all" onclick="setInsScope('all')">All</div>
+    </div>
+    <div id="ins-body"></div>
+  </section>
+
+  <!-- ============ CATEGORY DETAIL ============ -->
+  <section id="view-catdetail" class="hidden">
+    <div class="subhead"><button class="backbtn" onclick="go('insights')"><svg viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M15 6l-6 6 6 6"/></svg>Back</button><span class="st" id="cd-title">Category</span></div>
+    <div id="cd-body"></div>
   </section>
 
   <nav class="tabbar">
     <button class="tab on" id="tab-add" onclick="go('add')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Add</button>
     <button class="tab" id="tab-list" onclick="go('list')"><svg viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>Expenses</button>
     <button class="tab" id="tab-books" onclick="go('books')"><svg viewBox="0 0 24 24"><path d="M4 5a1 1 0 0 1 1-1h5a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4zM20 5a1 1 0 0 0-1-1h-5a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6z"/></svg>Books</button>
+    <button class="tab" id="tab-insights" onclick="go('insights')"><svg viewBox="0 0 24 24"><path d="M4 20V4M4 20h16M8 20v-6M12.5 20v-10M17 20v-4"/></svg>Insights</button>
   </nav>
 
   <div class="toast" id="toast">Saved</div>
@@ -328,6 +416,9 @@ const DEFAULT_BOOKS=[
 const KEY='expenses_books_v3';
 
 let books, curId='couple', me='Thibaud', draft, view='add';
+let searchOpen=false, searchQuery='';
+let insPerson='Thibaud', insScopeV='month', insPeriod=new Date().toISOString().slice(0,7), insBooksSel='all', cdCat=null;
+const INSPALETTE=['#3f6ef2','#1f9d55','#c07d0a','#7a3fb0','#b23b3b','#1f7d95','#a5426f'];
 
 function load(){
   try{const s=localStorage.getItem(KEY);if(s){books=JSON.parse(s);return;}}catch(e){}
@@ -372,13 +463,16 @@ function renderAppbar(){
   const w=document.getElementById('whoami');
   if(view==='list'&&isShared()){w.classList.remove('hidden');document.getElementById('me-name').textContent=me;}
   else w.classList.add('hidden');
-  document.getElementById('appbar').classList.toggle('hidden',view==='books');
+  document.getElementById('search-btn').classList.toggle('hidden',view!=='list');
+  document.getElementById('book-menu-btn').classList.toggle('hidden',view!=='list');
+  document.getElementById('appbar').classList.toggle('hidden',view==='books'||view==='insights'||view==='catdetail');
 }
 
 /* ---------- list ---------- */
 function renderList(){
   const b=book();
-  const items=[...b.items].sort((a,z)=>a.date<z.date?1:a.date>z.date?-1:0);
+  let items=[...b.items].sort((a,z)=>a.date<z.date?1:a.date>z.date?-1:0);
+  if(view==='list'&&searchQuery)items=items.filter(e=>matchExp(e,searchQuery));
   let grand=0,my=0;
   b.items.forEach(e=>{if(e.kind==='transfer')return;grand+=e.amount;my+=shareOf(e,me);});
   const sum=document.getElementById('summary');
@@ -393,7 +487,7 @@ function renderList(){
     bb.innerHTML='';bb.classList.add('hidden');
   }
   const box=document.getElementById('list');
-  if(!items.length){box.innerHTML='<div class="empty">No expenses in this book yet.<br>Tap <b>Add</b> to log one.</div>';return;}
+  if(!items.length){box.innerHTML=searchQuery?'<div class="empty">No matches for “'+escapeHtml(searchQuery)+'”.</div>':'<div class="empty">No expenses in this book yet.<br>Tap <b>Add</b> to log one.</div>';return;}
   let html='',cur=null;
   items.forEach(e=>{
     if(e.date!==cur){cur=e.date;html+=`<div class="dayhdr">${fmtDay(e.date)}</div>`;}
@@ -417,63 +511,70 @@ function renderList(){
 /* ---------- editor ---------- */
 function openEditor(id){
   const b=book();const e=b.items.find(x=>x.id===id);if(!e)return;
-  const shared=isShared(),M=b.members,isTr=e.kind==='transfer';
+  const isTr=e.kind==='transfer';
+  const M=['Thibaud','Chun']; // shared-book members (couple books are always these two)
   const catOpts=CATS.map(c=>`<option ${c===e.cat?'selected':''}>${escapeHtml(c)}</option>`).join('');
-  let typeSel='',transferBlock='',expenseBlock='';
-  if(shared){
-    typeSel=`<div class="efield"><label>Type</label><select id="e-kind" onchange="editorKindChange()">
-      <option value="expense" ${!isTr?'selected':''}>Expense</option>
-      <option value="transfer" ${isTr?'selected':''}>Transfer</option></select></div>`;
-    const from=e.from||M[0];
-    const dirOpts=[[M[0],M[1]],[M[1],M[0]]].map(([f,t])=>`<option value="${f}" ${from===f?'selected':''}>${f} → ${t}</option>`).join('');
-    transferBlock=`<div id="e-transfer" class="${isTr?'':'hidden'}"><div class="efield"><label>Direction</label><select id="e-dir">${dirOpts}</select></div></div>`;
-    const paidSel=`<div class="efield"><label>Paid by</label><select id="e-paid">${M.map(m=>`<option ${m===e.paidBy?'selected':''}>${m}</option>`).join('')}</select></div>`;
-    const sp=e.split||'ours';
-    const splitSel=`<div class="efield"><label>Split</label><select id="e-split" onchange="editorSplitChange()">
-      <option value="ours" ${sp==='ours'?'selected':''}>50 / 50</option>
-      <option value="custom" ${sp==='custom'?'selected':''}>Custom</option>
-      <option value="mine" ${sp==='mine'?'selected':''}>Just the payer</option></select></div>`;
-    const sh0=e.shares?e.shares[M[0]]:(e.amount/2);
-    const customRow=`<div class="efield${sp==='custom'?'':' hidden'}" id="e-customwrap"><label>${M[0]} owes (rest to ${M[1]})</label><input id="e-share" inputmode="decimal" value="${(+sh0).toFixed(2)}"></div>`;
-    expenseBlock=`<div id="e-expense" class="${isTr?'hidden':''}"><div class="efield"><label>Category</label><select id="e-cat">${catOpts}</select></div>${paidSel}${splitSel}${customRow}</div>`;
-  }else{
-    expenseBlock=`<div id="e-expense"><div class="efield"><label>Category</label><select id="e-cat">${catOpts}</select></div></div>`;
-  }
+  const bookOpts=books.map(bk=>`<option value="${bk.id}" ${bk.id===curId?'selected':''}>${escapeHtml(bk.id==='couple'?'Couple — Shared Living':bk.name)}</option>`).join('');
+  const from=e.from||M[0];
+  const dirOpts=[[M[0],M[1]],[M[1],M[0]]].map(([f,t])=>`<option value="${f}" ${from===f?'selected':''}>${f} → ${t}</option>`).join('');
+  const paidGuess=(e.paidBy&&M.includes(e.paidBy))?e.paidBy:M[0];
+  const paidOpts=M.map(m=>`<option ${m===paidGuess?'selected':''}>${m}</option>`).join('');
+  const sp=(e.split&&e.split!=='solo')?e.split:'ours';
+  const sh0=e.shares?e.shares[M[0]]:(e.amount/2);
   const html=`<div class="sheet"><h3>Edit ${isTr?'transfer':'expense'}</h3>
+    <div class="efield"><label>Book</label><select id="e-book" onchange="editorSync()">${bookOpts}</select></div>
     <div class="erow">
       <div class="efield"><label>Amount</label><input id="e-amt" inputmode="decimal" value="${e.amount}"></div>
       <div class="efield"><label>Date</label><input id="e-date" type="date" value="${e.date}"></div>
     </div>
     <div class="efield"><label>Name</label><input id="e-name" value="${escapeAttr(e.desc||'')}"></div>
-    ${typeSel}${transferBlock}${expenseBlock}
+    <div class="efield hidden" id="e-typewrap"><label>Type</label><select id="e-kind" onchange="editorSync()">
+      <option value="expense" ${!isTr?'selected':''}>Expense</option>
+      <option value="transfer" ${isTr?'selected':''}>Transfer</option></select></div>
+    <div class="efield hidden" id="e-transfer"><label>Direction</label><select id="e-dir">${dirOpts}</select></div>
+    <div class="efield" id="e-catfield"><label>Category</label><select id="e-cat">${catOpts}</select></div>
+    <div class="efield hidden" id="e-paidwrap"><label>Paid by</label><select id="e-paid">${paidOpts}</select></div>
+    <div class="efield hidden" id="e-splitwrap"><label>Split</label><select id="e-split" onchange="editorSync()">
+      <option value="ours" ${sp==='ours'?'selected':''}>50 / 50</option>
+      <option value="custom" ${sp==='custom'?'selected':''}>Custom</option>
+      <option value="mine" ${sp==='mine'?'selected':''}>Just the payer</option></select></div>
+    <div class="efield hidden" id="e-customwrap"><label>${M[0]} owes (rest to ${M[1]})</label><input id="e-share" inputmode="decimal" value="${(+sh0).toFixed(2)}"></div>
     <button class="ebtn primary" style="width:calc(100% - 32px);margin:12px 16px 2px" onclick="saveEditor('${id}')">Save</button>
     <button class="link" style="width:100%;padding:10px" onclick="closePicker()">Cancel</button>
     <div class="edit-del"><button class="dellink" onclick="deleteFromEditor('${id}')"><svg viewBox="0 0 24 24" style="fill:none;stroke-linecap:round;stroke-linejoin:round"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>Delete ${isTr?'transfer':'expense'}</button></div></div>`;
   const bg=document.createElement('div');bg.className='sheet-bg';bg.id='picker';bg.innerHTML=html;
   bg.onclick=ev=>{if(ev.target===bg)closePicker();};
   document.body.appendChild(bg);
+  editorSync();
 }
-function editorSplitChange(){
-  const v=document.getElementById('e-split').value;
-  document.getElementById('e-customwrap').classList.toggle('hidden',v!=='custom');
-}
-function editorKindChange(){
-  const v=document.getElementById('e-kind').value;
-  document.getElementById('e-expense').classList.toggle('hidden',v==='transfer');
-  document.getElementById('e-transfer').classList.toggle('hidden',v!=='transfer');
+function editorSync(){
+  const bk=books.find(x=>x.id===document.getElementById('e-book').value);
+  const shared=bk&&bk.type==='shared';
+  document.getElementById('e-typewrap').classList.toggle('hidden',!shared);
+  const kind=shared?document.getElementById('e-kind').value:'expense';
+  const isTr=shared&&kind==='transfer';
+  document.getElementById('e-transfer').classList.toggle('hidden',!isTr);
+  document.getElementById('e-catfield').classList.toggle('hidden',isTr);
+  document.getElementById('e-paidwrap').classList.toggle('hidden',!(shared&&!isTr));
+  document.getElementById('e-splitwrap').classList.toggle('hidden',!(shared&&!isTr));
+  const spv=document.getElementById('e-split').value;
+  document.getElementById('e-customwrap').classList.toggle('hidden',!(shared&&!isTr&&spv==='custom'));
 }
 function saveEditor(id){
-  const b=book();const e=b.items.find(x=>x.id===id);if(!e)return;
+  const srcBook=book();const e=srcBook.items.find(x=>x.id===id);if(!e)return;
   const amt=parseFloat(document.getElementById('e-amt').value);
   if(!(amt>0)){alert('Enter a valid amount');return;}
+  const targetId=document.getElementById('e-book').value;
+  const tb=books.find(x=>x.id===targetId)||srcBook;
+  const shared=tb.type==='shared';
   e.amount=Math.round(amt*100)/100;
   e.date=document.getElementById('e-date').value||e.date;
   const nm=(document.getElementById('e-name').value||'').trim();
-  const kind=isShared()?document.getElementById('e-kind').value:'expense';
+  const kind=shared?document.getElementById('e-kind').value:'expense';
   if(kind==='transfer'){
     e.kind='transfer';
-    const from=document.getElementById('e-dir').value;
-    e.from=from;e.to=(b.members[0]===from?b.members[1]:b.members[0]);
+    const fr=document.getElementById('e-dir').value;
+    e.from=fr;e.to=(tb.members[0]===fr?tb.members[1]:tb.members[0]);
     e.desc=nm||'Transfer';
     delete e.cat;delete e.paidBy;delete e.split;delete e.shares;
   }else{
@@ -481,17 +582,22 @@ function saveEditor(id){
     e.cat=document.getElementById('e-cat').value;
     e.desc=nm||e.cat;
     delete e.from;delete e.to;
-    if(isShared()){
+    if(shared){
       e.paidBy=document.getElementById('e-paid').value;
-      const sp=document.getElementById('e-split').value;e.split=sp;
-      if(sp==='custom'){
-        const M=b.members;let s0=parseFloat(document.getElementById('e-share').value)||0;
+      const spv=document.getElementById('e-split').value;e.split=spv;
+      if(spv==='custom'){
+        const M=tb.members;let s0=parseFloat(document.getElementById('e-share').value)||0;
         s0=Math.min(Math.max(0,s0),e.amount);
         e.shares={[M[0]]:Math.round(s0*100)/100,[M[1]]:Math.round((e.amount-s0)*100)/100};
       }else delete e.shares;
-    }else{e.paidBy=b.members[0];e.split='solo';}
+    }else{e.paidBy=tb.members[0];e.split='solo';delete e.shares;}
   }
-  persist();if(CLOUD)cloudUpsertExpense(e);closePicker();renderAll();toast('Updated');
+  const moved=targetId!==srcBook.id;
+  if(moved){
+    const idx=srcBook.items.findIndex(x=>x.id===id);if(idx>=0)srcBook.items.splice(idx,1);
+    tb.items.push(e);
+  }
+  persist();if(CLOUD)cloudUpsertExpense(e,targetId);closePicker();renderAll();toast(moved?'Moved to '+(tb.id==='couple'?'Couple':tb.name):'Updated');
 }
 let lastDeleted=null;
 function deleteFromEditor(id){
@@ -590,7 +696,6 @@ function renderDraft(){
   renderCatGrid();
   updateSaveState();
 }
-function cancelAdd(){go('list');}
 function renderCustomRow(){
   const M=book().members,amt=amountVal()||0;
   const s0=draft.customShare!=null?draft.customShare:+(amt/2).toFixed(2);
@@ -668,6 +773,17 @@ function chooseBookGo(id){chooseBook(id);go('list');}
 
 /* ---------- books page ---------- */
 function renderBooks(){
+  const list=document.getElementById('bookslist');
+  const fb=document.getElementById('books-footer');
+  if(view==='books'&&searchQuery){
+    const res=[];
+    books.forEach(b=>b.items.forEach(e=>{if(matchExp(e,searchQuery))res.push({b,e});}));
+    res.sort((x,z)=>x.e.date<z.e.date?1:x.e.date>z.e.date?-1:0);
+    list.innerHTML=res.length?res.map(({b,e})=>searchRow(b,e)).join(''):'<div class="empty">No matches for “'+escapeHtml(searchQuery)+'”.</div>';
+    if(fb)fb.classList.add('hidden');
+    return;
+  }
+  if(fb)fb.classList.remove('hidden');
   let html='';
   books.forEach(b=>{
     const total=b.items.reduce((s,e)=>s+e.amount,0);
@@ -677,9 +793,18 @@ function renderBooks(){
       <div style="flex:1;min-width:0"><div class="bn">${escapeHtml(b.name)}</div><div class="bm">${escapeHtml(sub)} · ${b.items.length} expenses</div></div>
       <div class="bt">${money(total)}</div></div>`;
   });
-  document.getElementById('bookslist').innerHTML=html+`<button class="addbook" onclick="openAddBook()">+ Add book</button>`;
-  const fb=document.getElementById('books-footer');if(fb){fb.textContent=CLOUD?'Sign out':'Reset demo data';fb.onclick=CLOUD?cloudSignOut:resetDemo;}
+  list.innerHTML=html+`<button class="addbook" onclick="openAddBook()">+ Add book</button>`;
+  if(fb){fb.textContent=CLOUD?'Sign out':'Reset demo data';fb.onclick=CLOUD?cloudSignOut:resetDemo;}
 }
+function searchRow(b,e){
+  const badge=`<span class="bookbadge">${escapeHtml(b.id==='couple'?'Couple':b.name)}</span>`;
+  if(e.kind==='transfer'){
+    return `<div class="row" onclick="openFromSearch('${b.id}','${e.id}')"><div class="ico tr"><svg viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg></div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||'Transfer')}${badge}</div><div class="rmeta">${fmtDay(e.date)} · ${e.from} → ${e.to}</div></div><div class="ramt">${money(e.amount)}</div></div>`;
+  }
+  const cc=CATCOLOR[e.cat]||CATCOLOR['Other'];
+  return `<div class="row" onclick="openFromSearch('${b.id}','${e.id}')"><div class="ico" style="background:${cc[0]};color:${cc[2]}">${svg(e.cat)}</div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||e.cat)}${badge}</div><div class="rmeta">${fmtDay(e.date)} · ${escapeHtml(e.cat)}</div></div><div class="ramt">${money(e.amount)}</div></div>`;
+}
+function openFromSearch(bookId,id){curId=bookId;me=book().members[0];saveCur();renderAppbar();openEditor(id);}
 let nbOwner='shared';
 function openAddBook(){
   nbOwner='shared';
@@ -710,22 +835,186 @@ function createBook(){
   newDraft();renderDraft();go('list');toast('Book created');
 }
 
+/* ---------- shared sheet helper ---------- */
+function mkSheet(html){const bg=document.createElement('div');bg.className='sheet-bg';bg.id='picker';bg.innerHTML=html;bg.onclick=ev=>{if(ev.target===bg)closePicker();};return bg;}
+
+/* ---------- search ---------- */
+function matchExp(e,q){if(!q)return true;q=(''+q).toLowerCase();
+  return (e.desc||'').toLowerCase().includes(q)||(e.cat||'').toLowerCase().includes(q)||String(e.amount).includes(q)||(e.from||'').toLowerCase().includes(q)||(e.to||'').toLowerCase().includes(q);}
+function positionSearchbar(){
+  const sb=document.getElementById('searchbar');
+  if(view==='books'){const sub=document.querySelector('#view-books .subhead');if(sub)sub.insertAdjacentElement('afterend',sb);}
+  else{document.getElementById('appbar').insertAdjacentElement('afterend',sb);}
+}
+function toggleSearch(){
+  searchOpen=!searchOpen;
+  if(searchOpen)positionSearchbar();
+  document.getElementById('searchbar').classList.toggle('hidden',!searchOpen);
+  ['search-btn','books-search-btn'].forEach(x=>{const el=document.getElementById(x);if(el)el.classList.toggle('on',searchOpen);});
+  if(searchOpen){const i=document.getElementById('search-input');i.value=searchQuery;setTimeout(()=>i.focus(),30);}
+  else searchQuery='';
+  rerenderSearch();
+}
+function onSearchInput(){searchQuery=document.getElementById('search-input').value;rerenderSearch();}
+function clearSearch(){searchQuery='';const i=document.getElementById('search-input');i.value='';i.focus();rerenderSearch();}
+function rerenderSearch(){if(view==='list')renderList();else if(view==='books')renderBooks();}
+
+/* ---------- book ⋮ menu + rename ---------- */
+function openBookMenu(){
+  const b=book();
+  const html=`<div class="sheet"><h3>${escapeHtml(b.id==='couple'?'Couple':b.name)}</h3>
+    <div class="menurow" onclick="openRenameBook()"><svg viewBox="0 0 24 24"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17z"/><path d="M13.5 7.5l3 3"/></svg>Rename book</div>
+    <button class="link" style="width:100%;padding:12px" onclick="closePicker()">Cancel</button></div>`;
+  document.body.appendChild(mkSheet(html));
+}
+function openRenameBook(){
+  closePicker();
+  const b=book();
+  const html=`<div class="sheet"><h3>Rename book</h3>
+    <div class="efield"><label>Name</label><input id="rb-name" value="${escapeAttr(b.name)}" autocomplete="off"></div>
+    <div class="ebtns"><button class="ebtn" onclick="closePicker()">Cancel</button>
+      <button class="ebtn primary" onclick="saveRename()">Save</button></div></div>`;
+  document.body.appendChild(mkSheet(html));
+  setTimeout(()=>{const el=document.getElementById('rb-name');if(el){el.focus();el.select();}},50);
+}
+function saveRename(){
+  const v=(document.getElementById('rb-name').value||'').trim();
+  if(!v){alert('Give the book a name');return;}
+  const b=book();b.name=v;persist();if(CLOUD)cloudRenameBook(b.id,v);
+  closePicker();renderAll();toast('Renamed');
+}
+
+/* ---------- insights ---------- */
+function personBooks(p){return books.filter(b=>b.members.includes(p));}
+function insSelectedBooks(){const pb=personBooks(insPerson);if(insBooksSel==='all')return pb;return pb.filter(b=>insBooksSel.includes(b.id));}
+function insBookColor(id){if(id==='couple')return '#3f6ef2';if(id==='personal')return '#1f9d55';if(id==='work')return '#c07d0a';const i=books.findIndex(x=>x.id===id);return INSPALETTE[(i<0?0:i)%INSPALETTE.length];}
+function periodPred(scope,period){if(scope==='all')return ()=>true;if(scope==='year')return e=>e.date.slice(0,4)===period;return e=>e.date.slice(0,7)===period;}
+function prevPeriod(scope,period){if(scope==='month'){let [y,m]=period.split('-').map(Number);m--;if(m<1){m=12;y--;}return y+'-'+String(m).padStart(2,'0');}if(scope==='year')return String(Number(period)-1);return null;}
+function stepPeriod(scope,period,dir){if(scope==='month'){let [y,m]=period.split('-').map(Number);m+=dir;while(m<1){m+=12;y--;}while(m>12){m-=12;y++;}return y+'-'+String(m).padStart(2,'0');}if(scope==='year')return String(Number(period)+dir);return period;}
+function fmtMonthFull(ym){const [y,m]=ym.split('-');return new Date(+y,+m-1,1).toLocaleDateString('en-US',{month:'long',year:'numeric'});}
+function fmtMonShort(ym){const [y,m]=ym.split('-');return new Date(+y,+m-1,1).toLocaleDateString('en-US',{month:'short'});}
+function insSum(pred){let tot=0;const byCat={};insSelectedBooks().forEach(b=>b.items.forEach(e=>{if(e.kind==='transfer')return;if(!pred(e))return;const s=shareOf(e,insPerson);if(!s)return;tot+=s;byCat[e.cat]=(byCat[e.cat]||0)+s;}));return {tot,byCat};}
+function trendRows(){
+  const bks=insSelectedBooks();let periods=[];
+  if(insScopeV==='month'){for(let i=5;i>=0;i--)periods.push(stepPeriod('month',insPeriod,-i));}
+  else if(insScopeV==='year'){for(let m=1;m<=12;m++)periods.push(insPeriod+'-'+String(m).padStart(2,'0'));}
+  else{const ys=new Set();bks.forEach(b=>b.items.forEach(e=>{if(e.kind!=='transfer'&&shareOf(e,insPerson))ys.add(e.date.slice(0,4));}));periods=[...ys].sort();if(!periods.length)periods=[String(new Date().getFullYear())];}
+  const keyLen=(insScopeV==='all')?4:7;
+  return periods.map(p=>{const per={};let t=0;bks.forEach(b=>{let s=0;b.items.forEach(e=>{if(e.kind==='transfer')return;if(e.date.slice(0,keyLen)!==p)return;s+=shareOf(e,insPerson);});if(s>0){per[b.id]=s;t+=s;}});return {period:p,per,total:t};});
+}
+function insBarTap(period){if(insScopeV==='month')insPeriod=period;else if(insScopeV==='year'){insScopeV='month';insPeriod=period;}else{insScopeV='year';insPeriod=period;}renderInsights();}
+function insStep(dir){insPeriod=stepPeriod(insScopeV,insPeriod,dir);renderInsights();}
+function setInsScope(s){
+  if(s===insScopeV)return;
+  const cur=new Date().toISOString().slice(0,10);
+  if(s==='year'){insPeriod=(insPeriod&&insPeriod.slice(0,4))||cur.slice(0,4);}
+  else if(s==='month'){const y=(insPeriod&&insPeriod.slice(0,4))||cur.slice(0,4);let mm;if(insScopeV==='year')mm=(y===cur.slice(0,4))?cur.slice(5,7):'12';else mm=(insPeriod&&/^\d{4}-\d{2}/.test(insPeriod))?insPeriod.slice(5,7):cur.slice(5,7);insPeriod=y+'-'+mm;}
+  insScopeV=s;renderInsights();
+}
+function openInsPerson(){
+  const html=`<div class="sheet"><h3>Whose spending</h3>`+
+    ['Thibaud','Chun'].map(p=>`<div class="bookopt${p===insPerson?' on':''}" onclick="pickInsPerson('${p}')"><div class="bi"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.5 3.1-6 7-6s7 2.5 7 6"/></svg></div><div style="flex:1"><div class="bn">${p}</div></div></div>`).join('')
+    +`<button class="link" style="width:100%;padding:12px" onclick="closePicker()">Cancel</button></div>`;
+  document.body.appendChild(mkSheet(html));
+}
+function pickInsPerson(p){insPerson=p;insBooksSel='all';closePicker();renderInsights();}
+function openInsBooks(){
+  const pb=personBooks(insPerson);
+  let html=`<div class="sheet"><h3>Which books</h3>`;
+  html+=`<div class="bookopt${insBooksSel==='all'?' on':''}" onclick="insBooksAll()"><div class="bi"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></div><div style="flex:1"><div class="bn">All books</div></div>${insBooksSel==='all'?'<span style="color:var(--accent);font-weight:800">✓</span>':''}</div>`;
+  pb.forEach(b=>{const on=Array.isArray(insBooksSel)&&insBooksSel.includes(b.id);html+=`<div class="bookopt${on?' on':''}" onclick="insBooksToggle('${b.id}')"><div class="bi">${bookIcon(b)}</div><div style="flex:1"><div class="bn">${escapeHtml(b.id==='couple'?'Couple':b.name)}</div></div>${on?'<span style="color:var(--accent);font-weight:800">✓</span>':''}</div>`;});
+  html+=`<button class="ebtn primary" style="width:calc(100% - 32px);margin:8px 16px 2px" onclick="closePicker();renderInsights()">Done</button></div>`;
+  document.body.appendChild(mkSheet(html));
+}
+function insBooksAll(){insBooksSel='all';insBooksRefresh();}
+function insBooksToggle(id){
+  const pb=personBooks(insPerson).map(b=>b.id);
+  if(insBooksSel==='all'){insBooksSel=[id];}          // from "All", first tap isolates to just that book
+  else{
+    const i=insBooksSel.indexOf(id);if(i>=0)insBooksSel.splice(i,1);else insBooksSel.push(id);
+    if(insBooksSel.length===0)insBooksSel='all';       // nothing selected → back to All
+    else if(pb.every(x=>insBooksSel.includes(x)))insBooksSel='all'; // everything ticked → All
+  }
+  insBooksRefresh();
+}
+function insBooksRefresh(){closePicker();openInsBooks();renderInsights();}
+function renderInsights(){
+  document.getElementById('ins-person-lab').textContent=insPerson;
+  const pb=personBooks(insPerson);
+  let blabel;
+  if(insBooksSel==='all')blabel='All books';
+  else{const names=pb.filter(b=>insBooksSel.includes(b.id)).map(b=>b.id==='couple'?'Couple':b.name);blabel=!names.length?'No books':names.length===1?names[0]:names.length+' books';}
+  document.getElementById('ins-books-lab').textContent=blabel;
+  document.querySelectorAll('#ins-scope .opt').forEach(o=>o.classList.toggle('on',o.dataset.s===insScopeV));
+  const body=document.getElementById('ins-body');
+  const {tot,byCat}=insSum(periodPred(insScopeV,insPeriod));
+  let plabel=insScopeV==='month'?fmtMonthFull(insPeriod):insScopeV==='year'?insPeriod:'All time';
+  let deltaHtml='';
+  if(insScopeV!=='all'){const pp=prevPeriod(insScopeV,insPeriod);if(pp){const prevTot=insSum(periodPred(insScopeV,pp)).tot;if(prevTot>0){const d=(tot-prevTot)/prevTot*100;const cls=Math.abs(d)<0.5?'flat':d<0?'down':'up';const arrow=d<-0.5?'▼':d>0.5?'▲':'▬';const plab=insScopeV==='month'?fmtMonShort(pp):pp;deltaHtml=`<span class="delta ${cls}">${arrow} ${Math.abs(Math.round(d))}% vs ${plab}</span>`;}}}
+  const rows=trendRows();const maxT=Math.max(...rows.map(r=>r.total),1);const selBooks=insSelectedBooks();
+  const bars=rows.map(r=>{
+    const sel=(insScopeV==='month'&&r.period===insPeriod);
+    const h=Math.max(Math.round(r.total/maxT*60),r.total>0?4:2);
+    let segs='';selBooks.forEach(b=>{const v=r.per[b.id]||0;if(v<=0)return;const pct=Math.round(v/(r.total||1)*100);segs+=`<span class="seg" style="height:${pct}%;background:${insBookColor(b.id)}"></span>`;});
+    const lab=(insScopeV==='all')?r.period:fmtMonShort(r.period);
+    return `<div class="tb${sel?' sel':''}" onclick="insBarTap('${r.period}')"><div class="stack" style="height:${h}px">${segs}</div><span class="tl">${lab}</span></div>`;
+  }).join('');
+  const cap=insScopeV==='month'?'tap a bar to change month':insScopeV==='year'?'tap a month to drill in':'tap a year to drill in';
+  const legend=selBooks.map(b=>`<span class="lg"><span class="sw" style="background:${insBookColor(b.id)}"></span>${escapeHtml(b.id==='couple'?'Couple':b.name)}</span>`).join('');
+  const cats=Object.keys(byCat).sort((a,z)=>byCat[z]-byCat[a]);const maxC=Math.max(...cats.map(c=>byCat[c]),1);
+  let catHtml;
+  if(!cats.length)catHtml=`<div class="ins-empty">No spending for ${escapeHtml(insPerson)} in ${escapeHtml(plabel)}.</div>`;
+  else catHtml=cats.map(c=>{const cc=CATCOLOR[c]||CATCOLOR['Other'];const w=Math.round(byCat[c]/maxC*100);return `<div class="catrow" onclick="openCatDetail('${escapeAttr(c)}')"><span class="cico" style="background:${cc[0]};color:${cc[2]}">${svg(c)}</span><div class="cmid"><div class="ctop"><span>${escapeHtml(c)}</span><span class="camt">${money(byCat[c])}</span></div><div class="cbar" style="width:${w}%;background:${cc[2]}"></div></div><span class="cchev">›</span></div>`;}).join('');
+  const dis=insScopeV==='all'?'disabled':'';
+  body.innerHTML=`<div class="inscard">
+      <div class="insstep"><button class="nav" ${dis} onclick="insStep(-1)">‹</button><span class="plabel">${escapeHtml(plabel)}</span><button class="nav" ${dis} onclick="insStep(1)">›</button></div>
+      <div class="instot"><span class="big">${money(tot)}</span>${deltaHtml}</div>
+      <div class="trend">${bars}</div>
+      <div class="trendcap">${cap}</div>
+    </div>
+    ${legend?`<div class="inslegend">${legend}</div>`:''}
+    <div class="inslabel">By category</div>${catHtml}`;
+}
+function openCatDetail(cat){cdCat=cat;go('catdetail');}
+function renderCatDetail(){
+  document.getElementById('cd-title').textContent=cdCat;
+  const pred=periodPred(insScopeV,insPeriod);const rows=[];
+  insSelectedBooks().forEach(b=>b.items.forEach(e=>{if(e.kind==='transfer'||e.cat!==cdCat||!pred(e))return;const s=shareOf(e,insPerson);if(!s)return;rows.push({b,e,s});}));
+  rows.sort((x,z)=>x.e.date<z.e.date?1:x.e.date>z.e.date?-1:0);
+  const tot=rows.reduce((a,r)=>a+r.s,0);
+  const scopeLbl=insScopeV==='month'?fmtMonthFull(insPeriod):insScopeV==='year'?insPeriod:'all time';
+  let html=`<div class="summary"><div class="sumcard" style="flex:none;width:100%"><div class="lbl">${escapeHtml(insPerson)}'s ${escapeHtml(cdCat)} · ${escapeHtml(scopeLbl)}</div><div class="val">${money(tot)}</div></div></div>`;
+  if(!rows.length){document.getElementById('cd-body').innerHTML=html+'<div class="empty">Nothing here.</div>';return;}
+  let cur=null;
+  rows.forEach(({b,e,s})=>{
+    if(e.date!==cur){cur=e.date;html+=`<div class="dayhdr">${fmtDay(e.date)}</div>`;}
+    const cc=CATCOLOR[e.cat]||CATCOLOR['Other'];const badge=`<span class="bookbadge">${escapeHtml(b.id==='couple'?'Couple':b.name)}</span>`;
+    const meta=b.type==='shared'?('your share'+(e.amount!==s?' · of '+money(e.amount):'')):'full amount';
+    html+=`<div class="row" onclick="openFromSearch('${b.id}','${e.id}')"><div class="ico" style="background:${cc[0]};color:${cc[2]}">${svg(e.cat)}</div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||e.cat)}${badge}</div><div class="rmeta">${meta}</div></div><div class="ramt">${money(s)}</div></div>`;
+  });
+  document.getElementById('cd-body').innerHTML=html;
+}
+
 /* ---------- nav ---------- */
 function go(v){
   view=v;
-  ['add','list','bal','books'].forEach(x=>document.getElementById('view-'+x).classList.toggle('hidden',x!==v));
-  const active=(v==='bal')?'list':v;
-  ['add','list','books'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('on',x===active));
+  if(searchOpen){searchOpen=false;searchQuery='';document.getElementById('searchbar').classList.add('hidden');
+    ['search-btn','books-search-btn'].forEach(x=>{const el=document.getElementById(x);if(el)el.classList.remove('on');});}
+  ['add','list','bal','books','insights','catdetail'].forEach(x=>document.getElementById('view-'+x).classList.toggle('hidden',x!==v));
+  const active=(v==='bal')?'list':(v==='catdetail')?'insights':v;
+  ['add','list','books','insights'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('on',x===active));
   if(v==='add'){newDraft();renderDraft();focusAmount();}
   if(v==='list')renderList();
   if(v==='bal')renderBal();
   if(v==='books')renderBooks();
+  if(v==='insights')renderInsights();
+  if(v==='catdetail')renderCatDetail();
   renderAppbar();window.scrollTo(0,0);
 }
 function toggleMe(){const M=book().members;me=me===M[0]?M[1]:M[0];document.getElementById('me-name').textContent=me;renderList();}
 function toast(m){const t=document.getElementById('toast');t.classList.remove('act');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1400);}
 function toastUndo(msg){const t=document.getElementById('toast');t.innerHTML=`${msg} <button class="undo" onclick="undoDelete()">Undo</button>`;t.classList.add('show','act');clearTimeout(t._t);t._t=setTimeout(()=>{t.classList.remove('show','act');t.textContent='Saved';lastDeleted=null;},4500);}
-function renderAll(){renderAppbar();if(view==='list')renderList();if(view==='bal')renderBal();if(view==='books')renderBooks();}
+function renderAll(){renderAppbar();if(view==='list')renderList();if(view==='bal')renderBal();if(view==='books')renderBooks();if(view==='insights')renderInsights();if(view==='catdetail')renderCatDetail();}
 
 document.getElementById('amt-input').addEventListener('input',function(){
   this.value=this.value.replace(/[^0-9.]/g,'').replace(/(\..*)\./g,'$1').replace(/(\.\d\d)\d+/,'$1');
@@ -739,9 +1028,10 @@ document.getElementById('name-input').addEventListener('keydown',e=>{if(e.key===
 function toRow(item,bookId){return {id:item.id,book_id:bookId,date:item.date,description:item.desc||null,category:item.cat||null,amount:item.amount,paid_by:(item.paidBy||item.from)||null,split:item.split||null,shares:item.shares||null,kind:item.kind||'expense',to_member:item.to||null};}
 function fromRow(r){if(r.kind==='transfer')return {id:r.id,kind:'transfer',date:r.date,from:r.paid_by,to:r.to_member,amount:Number(r.amount),desc:r.description};const it={id:r.id,kind:'expense',date:r.date,desc:r.description,cat:r.category,amount:Number(r.amount),paidBy:r.paid_by,split:r.split};if(r.shares)it.shares=r.shares;return it;}
 async function cloudInsertExpense(item,bookId){const {error}=await supa.from('expenses').insert(toRow(item,bookId));if(error)cloudWarn(error);}
-async function cloudUpsertExpense(item){const {error}=await supa.from('expenses').update(toRow(item,curId)).eq('id',item.id);if(error)cloudWarn(error);}
+async function cloudUpsertExpense(item,bookId){const {error}=await supa.from('expenses').update(toRow(item,bookId||curId)).eq('id',item.id);if(error)cloudWarn(error);}
 async function cloudDeleteExpense(id){const {error}=await supa.from('expenses').delete().eq('id',id);if(error)cloudWarn(error);}
 async function cloudInsertBook(b){const {error}=await supa.from('books').insert({id:b.id,name:b.name,type:b.type,members:b.members,sort:Date.now()});if(error)cloudWarn(error);}
+async function cloudRenameBook(id,name){const {error}=await supa.from('books').update({name}).eq('id',id);if(error)cloudWarn(error);}
 function cloudWarn(error){console.error(error);toast('Sync error — check connection');}
 async function cloudSignOut(){try{await supa.auth.signOut();}catch(e){}location.reload();}
 async function cloudFetch(){
@@ -764,7 +1054,7 @@ function subscribeRealtime(){
     .subscribe();
 }
 function queueRefetch(){clearTimeout(rtTimer);rtTimer=setTimeout(async()=>{const kc=curId,km=me;await cloudFetch();curId=books.some(b=>b.id===kc)?kc:(books[0]&&books[0].id);me=(book().members.indexOf(km)>=0)?km:book().members[0];renderAll();},250);}
-async function cloudBoot(){await cloudFetch();restoreCur();newDraft();renderDraft();renderAppbar();go('add');subscribeRealtime();}
+async function cloudBoot(){await cloudFetch();restoreCur();insPerson=(me==='Chun')?'Chun':'Thibaud';newDraft();renderDraft();renderAppbar();go('add');subscribeRealtime();}
 function showLogin(){document.getElementById('login').classList.remove('hidden');}
 function hideLogin(){document.getElementById('login').classList.add('hidden');}
 async function doLogin(e){
@@ -786,7 +1076,7 @@ async function initCloud(){
 
 /* ---------- boot ---------- */
 if(CLOUD){ initCloud(); }
-else { load();restoreCur();newDraft();renderDraft();renderAppbar();go('add'); }
+else { load();restoreCur();insPerson=(me==='Chun')?'Chun':'Thibaud';newDraft();renderDraft();renderAppbar();go('add'); }
 </script>
 </body>
 </html>
