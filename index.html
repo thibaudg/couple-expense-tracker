@@ -30,11 +30,12 @@
   .appbar{position:sticky;top:0;z-index:15;background:var(--bg);
     display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px;}
   .bookchip{display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);
-    color:var(--txt);font-size:15px;font-weight:700;padding:9px 14px;border-radius:22px;max-width:78%;}
-  .bookchip .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .bookchip svg{width:16px;height:16px;color:var(--sub);}
+    color:var(--txt);font-size:15px;font-weight:700;padding:9px 14px;border-radius:22px;min-width:0;flex:0 1 auto;overflow:hidden;}
+  .bookchip .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto;}
+  .bookchip svg{width:16px;height:16px;color:var(--sub);flex:0 0 auto;}
+  .bookchip .bemoji{flex:0 0 auto;display:inline-flex;}
   .bookchip .bemoji svg{width:18px;height:18px;color:var(--accent);}
-  .appbar-right{display:flex;align-items:center;gap:8px;}
+  .appbar-right{display:flex;align-items:center;gap:8px;flex:0 0 auto;}
   .whoami{background:var(--card);border:1px solid var(--line);color:var(--txt);font-size:13px;
     font-weight:600;padding:8px 12px;border-radius:20px;display:flex;align-items:center;gap:6px;}
   .whoami .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);}
@@ -232,11 +233,11 @@
   .instot .delta.down{color:var(--green);}
   .instot .delta.up{color:#c0392b;}
   .instot .delta.flat{color:var(--muted);}
-  .trend{display:flex;align-items:flex-end;justify-content:space-between;gap:6px;height:78px;margin-top:12px;}
-  .trend .tb{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;cursor:pointer;}
+  .trend{display:flex;align-items:flex-end;justify-content:space-between;gap:4px;height:78px;margin-top:12px;}
+  .trend .tb{flex:1 1 0;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;cursor:pointer;}
   .trend .stack{width:100%;max-width:30px;border-radius:5px 5px 0 0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;}
   .trend .stack .seg{display:block;width:100%;}
-  .trend .tl{font-size:10px;color:var(--muted);}
+  .trend .tl{font-size:9.5px;color:var(--muted);white-space:nowrap;}
   .trend .tb.sel .stack{box-shadow:0 0 0 2px var(--accent);}
   .trend .tb.sel .tl{color:var(--accent);font-weight:800;}
   .trendcap{text-align:center;font-size:10.5px;color:var(--muted);margin-top:9px;}
@@ -249,8 +250,11 @@
   .catrow .cico{width:22px;height:22px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 22px;}
   .catrow .cico svg{width:14px;height:14px;}
   .catrow .cmid{flex:1;min-width:0;}
-  .catrow .ctop{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;}
+  .catrow .ctop{display:flex;justify-content:space-between;align-items:flex-start;font-size:13.5px;font-weight:600;gap:8px;}
+  .catrow .cright{display:flex;flex-direction:column;align-items:flex-end;line-height:1.15;flex:0 0 auto;}
   .catrow .camt{font-weight:800;}
+  .catrow .cavg{font-size:10.5px;color:var(--muted);font-weight:600;}
+  .insavg{font-size:11.5px;color:var(--sub);font-weight:600;margin-top:3px;}
   .catrow .cbar{height:5px;border-radius:3px;margin-top:5px;min-width:4px;}
   .catrow .cchev{color:var(--muted);font-size:16px;flex:0 0 auto;}
   .ins-empty{color:var(--muted);text-align:center;padding:36px 24px;font-size:14px;line-height:1.6;}
@@ -390,10 +394,13 @@ const IC={
  'Insurance':'<path d="M12 3l7 3v5c0 4.4-3 7.4-7 9-4-1.6-7-4.6-7-9V6z"/><path d="M9 12l2 2 4-4"/>',
  'Internet':'<path d="M2.5 8.5a15 15 0 0 1 19 0M5.5 12a10 10 0 0 1 13 0M8.5 15.3a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1"/>',
  'Electricity':'<path d="M13 3L5 13h6l-1 8 8-11h-6z"/>',
+ 'Flights':'<path d="M12 3.5c.9 0 1.5.7 1.5 1.6V10l7 4.2v2.1l-7-2.1v3.9l2 1.4v1.6L12 20l-3.5.7v-1.6l2-1.4v-3.9l-7 2.1v-2.1L10.5 10V5.1c0-.9.6-1.6 1.5-1.6z"/>',
+ 'Sports':'<circle cx="12" cy="12" r="8.5"/><path d="M12 8l3 2.2-1.1 3.6h-3.8L9 10.2z"/><path d="M12 8V4.2M9 10.2 5.4 9M15 10.2 18.6 9M10.1 13.8 8 17.2M13.9 13.8 16 17.2"/>',
+ 'Travel':'<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.3 2.4 14.7 0 17M12 3.5c-2.4 2.3-2.4 14.7 0 17M5 7.2c2 1.2 12 1.2 14 0M5 16.8c2-1.2 12-1.2 14 0"/>',
  'Other':'<circle cx="6" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="18" cy="12" r="1.5"/>'
 };
 function svg(cat){return '<svg viewBox="0 0 24 24">'+(IC[cat]||IC['Other'])+'</svg>';}
-const CATS=['Groceries','Restaurants & Bars','Cafe','Shopping','Transport','Rent & Charges','Accommodation','Entertainment','Healthcare','Insurance','Internet','Electricity','Other'];
+const CATS=['Groceries','Restaurants & Bars','Cafe','Shopping','Transport','Flights','Accommodation','Travel','Rent & Charges','Entertainment','Sports','Healthcare','Insurance','Internet','Electricity','Other'];
 const CATCOLOR={
  'Groceries':['#e8f4e2','#d6ecca','#4c7a2a'],'Restaurants & Bars':['#fbe9e2','#f6d5c8','#b5552f'],
  'Cafe':['#f6edda','#eeddb8','#8a6412'],'Shopping':['#fbe7f0','#f6cfe0','#a5426f'],
@@ -401,6 +408,8 @@ const CATCOLOR={
  'Accommodation':['#e2f4ee','#c9ebdf','#1f8a68'],'Entertainment':['#f2e9fb','#e2cff6','#7a3fb0'],
  'Healthcare':['#fce9e9','#f6cccc','#b23b3b'],'Insurance':['#e9edfb','#d3dbf5','#3f4fa0'],
  'Internet':['#e2f2f6','#c9e6ee','#1f7d95'],'Electricity':['#faf1d6','#f3e3ad','#8a6b1a'],
+ 'Flights':['#e7eafe','#d2d8fb','#3d53d1'],'Sports':['#fdecdc','#f8d9bd','#c06a15'],
+ 'Travel':['#dcf2f0','#c0e8e4','#0f8a80'],
  'Other':['#eeeee8','#deddd3','#6b6a63']};
 const BOOKICON={couple:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="16" cy="9" r="2.4"/><path d="M4 19c0-2.8 2.2-5 5-5s5 2.2 5 5M15 14c2.2 0 4 1.8 4 4"/></svg>',
  personal:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.5 3.1-6 7-6s7 2.5 7 6"/></svg>',
@@ -418,7 +427,14 @@ const KEY='expenses_books_v3';
 let books, curId='couple', me='Thibaud', draft, view='add';
 let searchOpen=false, searchQuery='';
 let insPerson='Thibaud', insScopeV='month', insPeriod=new Date().toISOString().slice(0,7), insBooksSel='all', cdCat=null;
-const INSPALETTE=['#3f6ef2','#1f9d55','#c07d0a','#7a3fb0','#b23b3b','#1f7d95','#a5426f'];
+// book colors by KIND (family), with distinct shades within a family
+const BOOKFAM={
+  couple:['#1f9d55','#15803d','#3cc27a','#0f5f34'],   // greens
+  personal:['#3f6ef2','#1e4fd1','#6b93f7','#12379e'], // blues
+  work:['#c07d0a','#a8690a','#dda63a','#7d4f08'],     // ambers
+  trip:['#7a3fb0','#5f2f96','#9d6bd0','#452170'],     // purples
+  other:['#1f7d95','#6b6a63','#a5426f','#b23b3b']
+};
 
 function load(){
   try{const s=localStorage.getItem(KEY);if(s){books=JSON.parse(s);return;}}catch(e){}
@@ -458,7 +474,7 @@ function bookIcon(b){return BOOKICON[b.id]||(b.type==='shared'?BOOKICON.couple:B
 /* ---------- appbar ---------- */
 function renderAppbar(){
   const b=book();
-  document.getElementById('book-name').textContent=b.id==='couple'?'Couple':b.name;
+  document.getElementById('book-name').textContent=b.name;
   document.getElementById('book-emoji').innerHTML=bookIcon(b);
   const w=document.getElementById('whoami');
   if(view==='list'&&isShared()){w.classList.remove('hidden');document.getElementById('me-name').textContent=me;}
@@ -597,7 +613,7 @@ function saveEditor(id){
     const idx=srcBook.items.findIndex(x=>x.id===id);if(idx>=0)srcBook.items.splice(idx,1);
     tb.items.push(e);
   }
-  persist();if(CLOUD)cloudUpsertExpense(e,targetId);closePicker();renderAll();toast(moved?'Moved to '+(tb.id==='couple'?'Couple':tb.name):'Updated');
+  persist();if(CLOUD)cloudUpsertExpense(e,targetId);closePicker();renderAll();toast(moved?'Moved to '+tb.name:'Updated');
 }
 let lastDeleted=null;
 function deleteFromEditor(id){
@@ -741,7 +757,7 @@ function save(){
       }
     }else{item.paidBy=b.members[0];item.split='solo';}
   }
-  b.items.push(item);persist();renderAll();toast('Saved to '+(b.id==='couple'?'Couple':b.name));if(CLOUD)cloudInsertExpense(item,b.id);
+  b.items.push(item);persist();renderAll();toast('Saved to '+(b.name));if(CLOUD)cloudInsertExpense(item,b.id);
   newDraft();renderDraft();focusAmount();
 }
 
@@ -797,7 +813,7 @@ function renderBooks(){
   if(fb){fb.textContent=CLOUD?'Sign out':'Reset demo data';fb.onclick=CLOUD?cloudSignOut:resetDemo;}
 }
 function searchRow(b,e){
-  const badge=`<span class="bookbadge">${escapeHtml(b.id==='couple'?'Couple':b.name)}</span>`;
+  const badge=`<span class="bookbadge">${escapeHtml(b.name)}</span>`;
   if(e.kind==='transfer'){
     return `<div class="row" onclick="openFromSearch('${b.id}','${e.id}')"><div class="ico tr"><svg viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg></div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||'Transfer')}${badge}</div><div class="rmeta">${fmtDay(e.date)} · ${e.from} → ${e.to}</div></div><div class="ramt">${money(e.amount)}</div></div>`;
   }
@@ -862,7 +878,7 @@ function rerenderSearch(){if(view==='list')renderList();else if(view==='books')r
 /* ---------- book ⋮ menu + rename ---------- */
 function openBookMenu(){
   const b=book();
-  const html=`<div class="sheet"><h3>${escapeHtml(b.id==='couple'?'Couple':b.name)}</h3>
+  const html=`<div class="sheet"><h3>${escapeHtml(b.name)}</h3>
     <div class="menurow" onclick="openRenameBook()"><svg viewBox="0 0 24 24"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17z"/><path d="M13.5 7.5l3 3"/></svg>Rename book</div>
     <button class="link" style="width:100%;padding:12px" onclick="closePicker()">Cancel</button></div>`;
   document.body.appendChild(mkSheet(html));
@@ -887,13 +903,28 @@ function saveRename(){
 /* ---------- insights ---------- */
 function personBooks(p){return books.filter(b=>b.members.includes(p));}
 function insSelectedBooks(){const pb=personBooks(insPerson);if(insBooksSel==='all')return pb;return pb.filter(b=>insBooksSel.includes(b.id));}
-function insBookColor(id){if(id==='couple')return '#3f6ef2';if(id==='personal')return '#1f9d55';if(id==='work')return '#c07d0a';const i=books.findIndex(x=>x.id===id);return INSPALETTE[(i<0?0:i)%INSPALETTE.length];}
+function bookFamily(b){
+  const id=b.id, n=(b.name||'').toLowerCase();
+  if(id==='couple'||id.indexOf('couple')===0||n.includes('couple'))return 'couple';
+  if(id==='personal'||n.includes('personal'))return 'personal';
+  if(id==='work'||n.includes('work'))return 'work';
+  if(/trip|travel|vacation|holiday|voyage/.test(n))return 'trip';
+  return 'other';
+}
+function insBookColor(id){
+  const b=books.find(x=>x.id===id);if(!b)return '#888';
+  const fam=bookFamily(b),pal=BOOKFAM[fam];
+  const sibs=books.filter(x=>bookFamily(x)===fam);
+  const idx=sibs.findIndex(x=>x.id===id);
+  return pal[(idx<0?0:idx)%pal.length];
+}
 function periodPred(scope,period){if(scope==='all')return ()=>true;if(scope==='year')return e=>e.date.slice(0,4)===period;return e=>e.date.slice(0,7)===period;}
 function prevPeriod(scope,period){if(scope==='month'){let [y,m]=period.split('-').map(Number);m--;if(m<1){m=12;y--;}return y+'-'+String(m).padStart(2,'0');}if(scope==='year')return String(Number(period)-1);return null;}
 function stepPeriod(scope,period,dir){if(scope==='month'){let [y,m]=period.split('-').map(Number);m+=dir;while(m<1){m+=12;y--;}while(m>12){m-=12;y++;}return y+'-'+String(m).padStart(2,'0');}if(scope==='year')return String(Number(period)+dir);return period;}
 function fmtMonthFull(ym){const [y,m]=ym.split('-');return new Date(+y,+m-1,1).toLocaleDateString('en-US',{month:'long',year:'numeric'});}
 function fmtMonShort(ym){const [y,m]=ym.split('-');return new Date(+y,+m-1,1).toLocaleDateString('en-US',{month:'short'});}
 function insSum(pred){let tot=0;const byCat={};insSelectedBooks().forEach(b=>b.items.forEach(e=>{if(e.kind==='transfer')return;if(!pred(e))return;const s=shareOf(e,insPerson);if(!s)return;tot+=s;byCat[e.cat]=(byCat[e.cat]||0)+s;}));return {tot,byCat};}
+function monthsWithData(pred){const set=new Set();insSelectedBooks().forEach(b=>b.items.forEach(e=>{if(e.kind==='transfer')return;if(!pred(e))return;if(!shareOf(e,insPerson))return;set.add(e.date.slice(0,7));}));return set.size;}
 function trendRows(){
   const bks=insSelectedBooks();let periods=[];
   if(insScopeV==='month'){for(let i=5;i>=0;i--)periods.push(stepPeriod('month',insPeriod,-i));}
@@ -922,7 +953,7 @@ function openInsBooks(){
   const pb=personBooks(insPerson);
   let html=`<div class="sheet"><h3>Which books</h3>`;
   html+=`<div class="bookopt${insBooksSel==='all'?' on':''}" onclick="insBooksAll()"><div class="bi"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></div><div style="flex:1"><div class="bn">All books</div></div>${insBooksSel==='all'?'<span style="color:var(--accent);font-weight:800">✓</span>':''}</div>`;
-  pb.forEach(b=>{const on=Array.isArray(insBooksSel)&&insBooksSel.includes(b.id);html+=`<div class="bookopt${on?' on':''}" onclick="insBooksToggle('${b.id}')"><div class="bi">${bookIcon(b)}</div><div style="flex:1"><div class="bn">${escapeHtml(b.id==='couple'?'Couple':b.name)}</div></div>${on?'<span style="color:var(--accent);font-weight:800">✓</span>':''}</div>`;});
+  pb.forEach(b=>{const on=Array.isArray(insBooksSel)&&insBooksSel.includes(b.id);html+=`<div class="bookopt${on?' on':''}" onclick="insBooksToggle('${b.id}')"><div class="bi">${bookIcon(b)}</div><div style="flex:1"><div class="bn">${escapeHtml(b.name)}</div></div>${on?'<span style="color:var(--accent);font-weight:800">✓</span>':''}</div>`;});
   html+=`<button class="ebtn primary" style="width:calc(100% - 32px);margin:8px 16px 2px" onclick="closePicker();renderInsights()">Done</button></div>`;
   document.body.appendChild(mkSheet(html));
 }
@@ -943,11 +974,13 @@ function renderInsights(){
   const pb=personBooks(insPerson);
   let blabel;
   if(insBooksSel==='all')blabel='All books';
-  else{const names=pb.filter(b=>insBooksSel.includes(b.id)).map(b=>b.id==='couple'?'Couple':b.name);blabel=!names.length?'No books':names.length===1?names[0]:names.length+' books';}
+  else{const names=pb.filter(b=>insBooksSel.includes(b.id)).map(b=>b.name);blabel=!names.length?'No books':names.length===1?names[0]:names.length+' books';}
   document.getElementById('ins-books-lab').textContent=blabel;
   document.querySelectorAll('#ins-scope .opt').forEach(o=>o.classList.toggle('on',o.dataset.s===insScopeV));
   const body=document.getElementById('ins-body');
   const {tot,byCat}=insSum(periodPred(insScopeV,insPeriod));
+  const nMonths=(insScopeV!=='month')?monthsWithData(periodPred(insScopeV,insPeriod)):1;
+  const showAvg=(insScopeV!=='month'&&nMonths>0);
   let plabel=insScopeV==='month'?fmtMonthFull(insPeriod):insScopeV==='year'?insPeriod:'All time';
   let deltaHtml='';
   if(insScopeV!=='all'){const pp=prevPeriod(insScopeV,insPeriod);if(pp){const prevTot=insSum(periodPred(insScopeV,pp)).tot;if(prevTot>0){const d=(tot-prevTot)/prevTot*100;const cls=Math.abs(d)<0.5?'flat':d<0?'down':'up';const arrow=d<-0.5?'▼':d>0.5?'▲':'▬';const plab=insScopeV==='month'?fmtMonShort(pp):pp;deltaHtml=`<span class="delta ${cls}">${arrow} ${Math.abs(Math.round(d))}% vs ${plab}</span>`;}}}
@@ -960,15 +993,16 @@ function renderInsights(){
     return `<div class="tb${sel?' sel':''}" onclick="insBarTap('${r.period}')"><div class="stack" style="height:${h}px">${segs}</div><span class="tl">${lab}</span></div>`;
   }).join('');
   const cap=insScopeV==='month'?'tap a bar to change month':insScopeV==='year'?'tap a month to drill in':'tap a year to drill in';
-  const legend=selBooks.map(b=>`<span class="lg"><span class="sw" style="background:${insBookColor(b.id)}"></span>${escapeHtml(b.id==='couple'?'Couple':b.name)}</span>`).join('');
+  const legend=selBooks.map(b=>`<span class="lg"><span class="sw" style="background:${insBookColor(b.id)}"></span>${escapeHtml(b.name)}</span>`).join('');
   const cats=Object.keys(byCat).sort((a,z)=>byCat[z]-byCat[a]);const maxC=Math.max(...cats.map(c=>byCat[c]),1);
   let catHtml;
   if(!cats.length)catHtml=`<div class="ins-empty">No spending for ${escapeHtml(insPerson)} in ${escapeHtml(plabel)}.</div>`;
-  else catHtml=cats.map(c=>{const cc=CATCOLOR[c]||CATCOLOR['Other'];const w=Math.round(byCat[c]/maxC*100);return `<div class="catrow" onclick="openCatDetail('${escapeAttr(c)}')"><span class="cico" style="background:${cc[0]};color:${cc[2]}">${svg(c)}</span><div class="cmid"><div class="ctop"><span>${escapeHtml(c)}</span><span class="camt">${money(byCat[c])}</span></div><div class="cbar" style="width:${w}%;background:${cc[2]}"></div></div><span class="cchev">›</span></div>`;}).join('');
+  else catHtml=cats.map(c=>{const cc=CATCOLOR[c]||CATCOLOR['Other'];const w=Math.round(byCat[c]/maxC*100);const avg=showAvg?`<span class="cavg">${money(byCat[c]/nMonths)}/mo</span>`:'';return `<div class="catrow" onclick="openCatDetail('${escapeAttr(c)}')"><span class="cico" style="background:${cc[0]};color:${cc[2]}">${svg(c)}</span><div class="cmid"><div class="ctop"><span>${escapeHtml(c)}</span><span class="cright"><span class="camt">${money(byCat[c])}</span>${avg}</span></div><div class="cbar" style="width:${w}%;background:${cc[2]}"></div></div><span class="cchev">›</span></div>`;}).join('');
   const dis=insScopeV==='all'?'disabled':'';
   body.innerHTML=`<div class="inscard">
       <div class="insstep"><button class="nav" ${dis} onclick="insStep(-1)">‹</button><span class="plabel">${escapeHtml(plabel)}</span><button class="nav" ${dis} onclick="insStep(1)">›</button></div>
       <div class="instot"><span class="big">${money(tot)}</span>${deltaHtml}</div>
+      ${showAvg?`<div class="insavg">avg ${money(tot/nMonths)}/mo · ${nMonths} month${nMonths>1?'s':''} with data</div>`:''}
       <div class="trend">${bars}</div>
       <div class="trendcap">${cap}</div>
     </div>
@@ -988,7 +1022,7 @@ function renderCatDetail(){
   let cur=null;
   rows.forEach(({b,e,s})=>{
     if(e.date!==cur){cur=e.date;html+=`<div class="dayhdr">${fmtDay(e.date)}</div>`;}
-    const cc=CATCOLOR[e.cat]||CATCOLOR['Other'];const badge=`<span class="bookbadge">${escapeHtml(b.id==='couple'?'Couple':b.name)}</span>`;
+    const cc=CATCOLOR[e.cat]||CATCOLOR['Other'];const badge=`<span class="bookbadge">${escapeHtml(b.name)}</span>`;
     const meta=b.type==='shared'?('your share'+(e.amount!==s?' · of '+money(e.amount):'')):'full amount';
     html+=`<div class="row" onclick="openFromSearch('${b.id}','${e.id}')"><div class="ico" style="background:${cc[0]};color:${cc[2]}">${svg(e.cat)}</div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||e.cat)}${badge}</div><div class="rmeta">${meta}</div></div><div class="ramt">${money(s)}</div></div>`;
   });
