@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Batch entry · Expenses</title>
+<style>
+  :root{
+    --bg:#f4f4f2; --card:#ffffff; --card2:#f0f0ee; --line:#e7e7e3;
+    --txt:#1b1b1a; --sub:#77776f; --muted:#a3a39b;
+    --accent:#3f6ef2; --accent-soft:#e9f0fe; --accent-line:#c5d8fb;
+    --green:#1f9d55; --amber:#c07d0a; --red:#c0392b;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:20px 22px 80px;}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:6px;}
+  h1{font-size:20px;font-weight:800;margin:0;letter-spacing:-.3px;}
+  .top a.back{font-size:13px;color:var(--accent);text-decoration:none;font-weight:600;}
+  .bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0;}
+  .bar .grp{display:flex;align-items:center;gap:8px;}
+  label.lbl{font-size:13px;color:var(--sub);font-weight:600;}
+  select,input{font-family:inherit;font-size:14px;color:var(--txt);background:var(--card);border:1px solid var(--line);
+    border-radius:8px;padding:8px 10px;outline:none;}
+  select:focus,input:focus{border-color:var(--accent-line);}
+  button{font-family:inherit;font-size:14px;font-weight:700;border-radius:8px;padding:9px 14px;cursor:pointer;
+    border:1px solid var(--line);background:var(--card);color:var(--txt);}
+  button:hover{background:var(--card2);}
+  button.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+  button.primary:hover{filter:brightness(.96);}
+  button.ghost{border:0;background:0;color:var(--accent);padding:6px 8px;}
+  .hint{font-size:12px;color:var(--muted);margin:2px 0 12px;line-height:1.5;}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+  thead th{font-size:12px;font-weight:700;color:var(--sub);text-align:left;background:var(--card2);padding:9px 10px;border-bottom:1px solid var(--line);}
+  tbody td{padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:0;}
+  td input,td select{width:100%;font-size:13px;padding:7px 8px;}
+  td input.amt{text-align:right;}
+  .bad{border-color:var(--red)!important;background:#fdecea!important;}
+  .st{width:26px;text-align:center;}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--muted);}
+  .dot.ok{background:var(--green);}
+  .dot.err{background:var(--red);}
+  .del{border:0;background:0;color:var(--muted);font-size:16px;cursor:pointer;padding:2px 6px;line-height:1;}
+  .del:hover{color:var(--red);}
+  .cust{display:flex;align-items:center;gap:4px;}
+  .cust .cu{font-size:11px;color:var(--sub);white-space:nowrap;}
+  .foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;flex-wrap:wrap;}
+  .summary{font-size:13px;color:var(--sub);}
+  .summary b{color:var(--txt);}
+  .cw-date{width:130px;} .cw-amt{width:104px;} .cw-cat{width:170px;} .cw-book{width:190px;}
+  .cw-paid{width:120px;} .cw-split{width:190px;} .cw-st{width:30px;} .cw-x{width:34px;}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--txt);color:#fff;
+    font-weight:700;font-size:14px;padding:11px 18px;border-radius:22px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50;}
+  .toast.show{opacity:1;}
+  .toast.err{background:var(--red);}
+  /* login */
+  .login{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:60;}
+  .login .card{width:100%;max-width:340px;padding:24px;}
+  .login h2{font-size:20px;margin:0 0 4px;text-align:center;}
+  .login p{font-size:13px;color:var(--sub);text-align:center;margin:0 0 18px;}
+  .login input{width:100%;margin-bottom:10px;padding:12px;font-size:15px;}
+  .login button{width:100%;padding:13px;}
+  .login .err{color:var(--red);font-size:13px;text-align:center;min-height:18px;margin-top:6px;}
+  .hidden{display:none!important;}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div class="login hidden" id="login">
+  <div class="card">
+    <h2>Batch entry</h2>
+    <p>Sign in with your shared account</p>
+    <form onsubmit="doLogin(event)">
+      <input type="email" id="login-email" placeholder="email" autocomplete="username">
+      <input type="password" id="login-pass" placeholder="password" autocomplete="current-password">
+      <button type="submit" class="primary" id="login-btn">Sign in</button>
+      <div class="err" id="login-err"></div>
+    </form>
+  </div>
+</div>
+
+<div class="wrap hidden" id="app">
+  <div class="top">
+    <h1>Batch entry <span style="font-weight:500;color:var(--sub);font-size:14px">· desktop</span></h1>
+    <a class="back" href="index.html">← Back to app</a>
+  </div>
+
+  <div class="bar">
+    <div class="grp">
+      <label class="lbl" for="def-book">Book for new rows</label>
+      <select id="def-book"></select>
+    </div>
+    <div class="grp" style="margin-left:auto">
+      <button onclick="addRows(1)">+ Add row</button>
+      <button onclick="addRows(5)">+ 5 rows</button>
+      <button class="primary" id="save-btn" onclick="saveAll()">Save all</button>
+    </div>
+  </div>
+  <div class="hint">
+    Type rows, or <b>paste from Excel / Google&nbsp;Sheets</b> (Cmd+V anywhere) — column order:
+    <b>Date · Amount · Description · Category · Paid by · Split</b>. Missing columns use sensible defaults.
+    Tab moves across, Enter adds a row. Empty rows are ignored; rows with problems are flagged in red and skipped on save.
+  </div>
+
+  <table>
+    <thead><tr>
+      <th class="cw-st"></th>
+      <th class="cw-book">Book</th>
+      <th class="cw-date">Date</th>
+      <th class="cw-amt">Amount</th>
+      <th>Description</th>
+      <th class="cw-cat">Category</th>
+      <th class="cw-paid">Paid by</th>
+      <th class="cw-split">Split</th>
+      <th class="cw-x"></th>
+    </tr></thead>
+    <tbody id="tb"></tbody>
+  </table>
+
+  <div class="foot">
+    <div class="summary" id="summary"></div>
+    <button class="ghost" onclick="addRows(5)">+ Add more rows</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- config (same project as the app; publishable key is public) ---------- */
+const SUPABASE_URL='https://uhbfcrajquihzkdbeooo.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_5cOEagITv7fEtmJTKqcEmQ_f4KfNYcP';
+let supa = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+const CATS=['Groceries','Restaurants & Bars','Cafe','Shopping','Transport','Flights','Accommodation','Travel','Rent & Charges','Entertainment','Sports','Healthcare','Insurance','Internet','Electricity','Other'];
+const SPLITS=[['ours','50 / 50'],['mine','Just the payer'],['custom','Custom…']];
+
+let books=[], rows=[];
+const today=()=>new Date().toISOString().slice(0,10);
+const gid=()=>'x'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function money(n){return '$'+(+n).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function bookById(id){return books.find(b=>b.id===id);}
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function defBook(){const s=document.getElementById('def-book');return s?s.value:(books[0]&&books[0].id);}
+
+/* ---------- new / empty rows ---------- */
+function blankRow(bookId){return {id:gid(),book:bookId||defBook(),date:today(),amount:'',desc:'',cat:'Groceries',paidBy:'Thibaud',split:'ours',share:''};}
+function addRows(n){for(let i=0;i<n;i++)rows.push(blankRow());render();}
+
+/* ---------- validation ---------- */
+function isEmptyRow(r){return r.amount===''&&r.desc.trim()==='';}
+function validate(r){
+  if(isEmptyRow(r))return {empty:true,bad:[]};
+  const bad=[]; const b=bookById(r.book);
+  const amt=parseFloat(r.amount); if(!(amt>0))bad.push('amount');
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(r.date)||isNaN(Date.parse(r.date)))bad.push('date');
+  if(CATS.indexOf(r.cat)<0)bad.push('cat');
+  if(!b){bad.push('book');}
+  else if(b.type==='shared'){
+    if(['Thibaud','Chun'].indexOf(r.paidBy)<0)bad.push('paidBy');
+    if(['ours','mine','custom'].indexOf(r.split)<0)bad.push('split');
+    if(r.split==='custom'){const s=parseFloat(r.share);if(!(s>=0)||(amt>0&&s>amt+0.001))bad.push('share');}
+  }
+  return {empty:false,bad};
+}
+
+/* ---------- render ---------- */
+function bookOpts(sel){return books.map(b=>`<option value="${b.id}" ${b.id===sel?'selected':''}>${esc(b.name)}</option>`).join('');}
+function catOpts(sel){return CATS.map(c=>`<option ${c===sel?'selected':''}>${esc(c)}</option>`).join('');}
+function rowHtml(r,i){
+  const v=validate(r); const bad=f=>v.bad.indexOf(f)>=0?' bad':'';
+  const b=bookById(r.book); const shared=b&&b.type==='shared';
+  const dot=v.empty?'<span class="dot"></span>':(v.bad.length?'<span class="dot err" title="'+v.bad.join(', ')+'"></span>':'<span class="dot ok"></span>');
+  let paidCell,splitCell;
+  if(shared){
+    paidCell=`<select data-i="${i}" data-f="paidBy">${['Thibaud','Chun'].map(m=>`<option ${m===r.paidBy?'selected':''}>${m}</option>`).join('')}</select>`;
+    let sp=`<select class="${bad('split')}" data-i="${i}" data-f="split">${SPLITS.map(s=>`<option value="${s[0]}" ${s[0]===r.split?'selected':''}>${s[1]}</option>`).join('')}</select>`;
+    if(r.split==='custom')sp=`<div class="cust">${sp}<span class="cu">T&nbsp;$</span><input class="amt${bad('share')}" style="width:64px" data-i="${i}" data-f="share" value="${esc(r.share)}" inputmode="decimal"></div>`;
+    splitCell=sp;
+  }else{
+    const owner=b?b.members[0]:'';
+    paidCell=`<span style="font-size:13px;color:var(--sub)">${esc(owner)}</span>`;
+    splitCell=`<span style="font-size:13px;color:var(--muted)">— personal —</span>`;
+  }
+  return `<tr>
+    <td class="st">${dot}</td>
+    <td><select data-i="${i}" data-f="book">${bookOpts(r.book)}</select></td>
+    <td><input class="${bad('date')}" type="date" data-i="${i}" data-f="date" value="${esc(r.date)}"></td>
+    <td><input class="amt${bad('amount')}" data-i="${i}" data-f="amount" value="${esc(r.amount)}" placeholder="0.00" inputmode="decimal"></td>
+    <td><input data-i="${i}" data-f="desc" value="${esc(r.desc)}" placeholder="What was it?"></td>
+    <td><select class="${bad('cat')}" data-i="${i}" data-f="cat">${catOpts(r.cat)}</select></td>
+    <td>${paidCell}</td>
+    <td>${splitCell}</td>
+    <td style="text-align:center"><button class="del" data-i="${i}" data-f="del" title="Remove">×</button></td>
+  </tr>`;
+}
+function render(){
+  document.getElementById('tb').innerHTML=rows.map(rowHtml).join('');
+  summary();
+}
+function summary(){
+  let ready=0,err=0,empty=0,tot=0;
+  rows.forEach(r=>{const v=validate(r);if(v.empty){empty++;}else if(v.bad.length){err++;}else{ready++;tot+=parseFloat(r.amount)||0;}});
+  const el=document.getElementById('summary');
+  el.innerHTML=`<b>${ready}</b> ready · <b>${tot?money(tot):'$0.00'}</b>` + (err?` &nbsp;·&nbsp; <span style="color:var(--red)"><b>${err}</b> need fixing</span>`:'') + (empty?` &nbsp;·&nbsp; ${empty} empty`:'');
+  document.getElementById('save-btn').textContent = ready?`Save all (${ready})`:'Save all';
+}
+
+/* ---------- editing (event delegation) ---------- */
+document.getElementById('tb').addEventListener('input',onEdit);
+document.getElementById('tb').addEventListener('change',onEdit);
+document.getElementById('tb').addEventListener('click',function(e){
+  const t=e.target; if(t.dataset&&t.dataset.f==='del'){rows.splice(+t.dataset.i,1);if(!rows.length)rows.push(blankRow());render();}
+});
+function onEdit(e){
+  const t=e.target; if(!t.dataset||t.dataset.i===undefined)return;
+  const i=+t.dataset.i, f=t.dataset.f; if(f==='del')return;
+  rows[i][f]=t.value;
+  if(f==='book'||f==='split'){ // options / custom field change -> rebuild that row
+    const tr=t.closest('tr'); tr.outerHTML=rowHtml(rows[i],i); summary(); return;
+  }
+  // repaint just this row's validity without losing focus
+  repaintRow(i);
+}
+function repaintRow(i){
+  const v=validate(rows[i]);
+  const tr=document.getElementById('tb').children[i]; if(!tr)return;
+  tr.querySelectorAll('[data-f]').forEach(el=>{
+    const f=el.dataset.f; if(f==='del'||f==='book')return;
+    el.classList.toggle('bad', v.bad.indexOf(f)>=0);
+  });
+  const dot=tr.querySelector('.dot');
+  if(dot){dot.className='dot'+(v.empty?'':(v.bad.length?' err':' ok'));dot.title=v.bad.join(', ');}
+  summary();
+}
+
+/* ---------- Enter = add row ---------- */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.tagName==='INPUT'&&e.target.dataset&&e.target.dataset.i!==undefined){e.preventDefault();addRows(1);}
+});
+
+/* ---------- paste from spreadsheet ---------- */
+function normPayer(s){s=(s||'').trim().toLowerCase();return s.startsWith('chun')?'Chun':'Thibaud';}
+function normCat(s){s=(s||'').trim().toLowerCase();const hit=CATS.find(c=>c.toLowerCase()===s);return hit||'Other';}
+function normSplit(s){s=(s||'').trim().toLowerCase();if(!s)return 'ours';if(s.includes('custom'))return 'custom';if(s.includes('just')||s==='mine'||s.includes('payer'))return 'mine';return 'ours';}
+function cleanAmt(s){s=(s||'').replace(/[^0-9.\-]/g,'');return s;}
+function normDate(s){s=(s||'').trim();if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;const d=new Date(s);return isNaN(d)?today():d.toISOString().slice(0,10);}
+document.addEventListener('paste',e=>{
+  const txt=(e.clipboardData||window.clipboardData).getData('text');
+  if(!txt||(!txt.includes('\t')&&!txt.includes('\n')))return; // single value -> normal paste
+  e.preventDefault();
+  const lines=txt.replace(/\r/g,'').split('\n').filter(l=>l.trim()!=='');
+  const bk=defBook();
+  const added=lines.map(line=>{
+    const c=line.split('\t');
+    const r=blankRow(bk);
+    if(c[0]!==undefined&&c[0].trim())r.date=normDate(c[0]);
+    if(c[1]!==undefined&&cleanAmt(c[1]))r.amount=cleanAmt(c[1]);
+    if(c[2]!==undefined)r.desc=c[2].trim();
+    if(c[3]!==undefined&&c[3].trim())r.cat=normCat(c[3]);
+    if(c[4]!==undefined&&c[4].trim())r.paidBy=normPayer(c[4]);
+    if(c[5]!==undefined&&c[5].trim())r.split=normSplit(c[5]);
+    return r;
+  });
+  // drop leading blank rows, then append pasted rows
+  rows=rows.filter(r=>!isEmptyRow(r)).concat(added);
+  render();
+  toast('Pasted '+added.length+' row'+(added.length>1?'s':''));
+});
+
+/* ---------- save ---------- */
+function buildDbRow(r){
+  const b=bookById(r.book); const amt=Math.round(parseFloat(r.amount)*100)/100;
+  const row={id:gid(),book_id:b.id,date:r.date,description:(r.desc.trim()||r.cat),category:r.cat,amount:amt,kind:'expense',to_member:null};
+  if(b.type==='shared'){
+    row.paid_by=r.paidBy; row.split=r.split; row.shares=null;
+    if(r.split==='custom'){let s0=Math.min(Math.max(0,parseFloat(r.share)||0),amt);row.shares={Thibaud:Math.round(s0*100)/100,Chun:Math.round((amt-s0)*100)/100};}
+  }else{row.paid_by=b.members[0];row.split='solo';row.shares=null;}
+  return row;
+}
+async function saveAll(){
+  const valid=[],keep=[];
+  let errs=0;
+  rows.forEach(r=>{const v=validate(r);if(v.empty)return;if(v.bad.length){errs++;keep.push(r);}else{valid.push(r);}});
+  if(!valid.length){toast(errs?'Fix the highlighted rows first':'Nothing to save',true);return;}
+  const btn=document.getElementById('save-btn');btn.disabled=true;btn.textContent='Saving…';
+  const payload=valid.map(buildDbRow);
+  const {error}=await supa.from('expenses').insert(payload);
+  btn.disabled=false;
+  if(error){console.error(error);toast('Save failed — '+(error.message||'check connection'),true);summary();return;}
+  // keep only rows that still need fixing, then top up with a few blanks
+  rows=keep; while(rows.length<Math.max(5,keep.length))rows.push(blankRow());
+  render();
+  toast('Saved '+payload.length+' expense'+(payload.length>1?'s':'')+(errs?' · '+errs+' skipped (still flagged)':''));
+}
+
+/* ---------- toast ---------- */
+let tT;
+function toast(m,isErr){const t=document.getElementById('toast');t.textContent=m;t.className='toast show'+(isErr?' err':'');clearTimeout(tT);tT=setTimeout(()=>t.className='toast',2600);}
+
+/* ---------- boot / auth ---------- */
+async function fetchBooks(){
+  const {data,error}=await supa.from('books').select('*').order('sort',{ascending:true});
+  if(error){console.error(error);toast('Could not load books',true);return;}
+  books=(data||[]).map(b=>({id:b.id,name:b.name,type:b.type,members:b.members}));
+}
+async function boot(){
+  await fetchBooks();
+  if(!books.length){toast('No books found',true);return;}
+  document.getElementById('def-book').innerHTML=bookOpts(books[0].id);
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  rows=[]; addRows(8);
+}
+async function doLogin(e){
+  e.preventDefault();
+  const email=document.getElementById('login-email').value.trim();
+  const pw=document.getElementById('login-pass').value;
+  const err=document.getElementById('login-err');err.textContent='';
+  const btn=document.getElementById('login-btn');btn.disabled=true;
+  const {error}=await supa.auth.signInWithPassword({email,password:pw});
+  btn.disabled=false;
+  if(error){err.textContent=error.message;return;}
+  boot();
+}
+async function init(){
+  if(!supa){document.body.innerHTML='<p style="padding:24px">Could not load Supabase library (offline?).</p>';return;}
+  const {data}=await supa.auth.getSession();
+  if(data&&data.session)boot();
+  else document.getElementById('login').classList.remove('hidden');
+}
+init();
+</script>
+</body>
+</html>
