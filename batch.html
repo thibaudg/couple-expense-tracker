@@ -31,8 +31,8 @@
   button.primary:hover{filter:brightness(.96);}
   button.ghost{border:0;background:0;color:var(--accent);padding:6px 8px;}
   .hint{font-size:12px;color:var(--muted);margin:2px 0 12px;line-height:1.5;}
-  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
-  thead th{font-size:12px;font-weight:700;color:var(--sub);text-align:left;background:var(--card2);padding:9px 10px;border-bottom:1px solid var(--line);}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;table-layout:fixed;}
+  thead th{font-size:12px;font-weight:700;color:var(--sub);text-align:left;background:var(--card2);padding:9px 10px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2;}
   tbody td{padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:middle;}
   tbody tr:last-child td{border-bottom:0;}
   td input,td select{width:100%;font-size:13px;padding:7px 8px;}
@@ -44,13 +44,14 @@
   .dot.err{background:var(--red);}
   .del{border:0;background:0;color:var(--muted);font-size:16px;cursor:pointer;padding:2px 6px;line-height:1;}
   .del:hover{color:var(--red);}
-  .cust{display:flex;align-items:center;gap:4px;}
+  .cust{display:flex;align-items:center;gap:4px;margin-top:3px;}
   .cust .cu{font-size:11px;color:var(--sub);white-space:nowrap;}
   .foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;flex-wrap:wrap;}
   .summary{font-size:13px;color:var(--sub);}
   .summary b{color:var(--txt);}
-  .cw-date{width:130px;} .cw-amt{width:104px;} .cw-cat{width:170px;} .cw-book{width:190px;}
-  .cw-paid{width:120px;} .cw-split{width:190px;} .cw-st{width:30px;} .cw-x{width:34px;}
+  .cw-date{width:126px;} .cw-amt{width:88px;} .cw-cat{width:146px;} .cw-book{width:116px;}
+  .cw-paid{width:88px;} .cw-split{width:120px;} .cw-st{width:26px;} .cw-x{width:30px;}
+  td select,td input{max-width:100%;text-overflow:ellipsis;}
   .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--txt);color:#fff;
     font-weight:700;font-size:14px;padding:11px 18px;border-radius:22px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50;}
   .toast.show{opacity:1;}
@@ -94,15 +95,15 @@
       <select id="def-book"></select>
     </div>
     <div class="grp" style="margin-left:auto">
-      <button onclick="addRows(1)">+ Add row</button>
-      <button onclick="addRows(5)">+ 5 rows</button>
+      <input id="add-n" type="number" min="1" max="300" value="10" style="width:62px" aria-label="Number of rows to add">
+      <button onclick="addN()">Add rows</button>
       <button class="primary" id="save-btn" onclick="saveAll()">Save all</button>
     </div>
   </div>
   <div class="hint">
     Type rows, or <b>paste from Excel / Google&nbsp;Sheets</b> (Cmd+V anywhere) — column order:
     <b>Date · Amount · Description · Category · Paid by · Split</b>. Missing columns use sensible defaults.
-    Tab moves across, Enter adds a row. Empty rows are ignored; rows with problems are flagged in red and skipped on save.
+    Tab moves across, Enter moves down — a fresh row always waits at the bottom, so just keep typing (or use “Add rows” for a big batch). Empty rows are ignored; rows with problems are flagged in red and skipped on save.
   </div>
 
   <table>
@@ -122,7 +123,7 @@
 
   <div class="foot">
     <div class="summary" id="summary"></div>
-    <button class="ghost" onclick="addRows(5)">+ Add more rows</button>
+    <button class="ghost" onclick="addRows(10)">+ Add 10 more rows</button>
   </div>
 </div>
 
@@ -135,7 +136,7 @@ const SUPABASE_ANON_KEY='sb_publishable_5cOEagITv7fEtmJTKqcEmQ_f4KfNYcP';
 let supa = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
 const CATS=['Groceries','Restaurants & Bars','Cafe','Shopping','Transport','Flights','Accommodation','Travel','Rent & Charges','Entertainment','Sports','Healthcare','Insurance','Internet','Electricity','Other'];
-const SPLITS=[['ours','50 / 50'],['mine','Just the payer'],['custom','Custom…']];
+const SPLITS=[['ours','50 / 50'],['mine','Payer only'],['custom','Custom']];
 
 let books=[], rows=[];
 const today=()=>new Date().toISOString().slice(0,10);
@@ -146,8 +147,15 @@ function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>'
 function defBook(){const s=document.getElementById('def-book');return s?s.value:(books[0]&&books[0].id);}
 
 /* ---------- new / empty rows ---------- */
-function blankRow(bookId){return {id:gid(),book:bookId||defBook(),date:today(),amount:'',desc:'',cat:'Groceries',paidBy:'Thibaud',split:'ours',share:''};}
+function blankRow(bookId){
+  const last=rows[rows.length-1];
+  const date=(last&&/^\d{4}-\d{2}-\d{2}$/.test(last.date))?last.date:today(); // carry the last date for same-day runs
+  return {id:gid(),book:bookId||defBook(),date:date,amount:'',desc:'',cat:'Groceries',paidBy:'Thibaud',split:'ours',share:''};
+}
 function addRows(n){for(let i=0;i<n;i++)rows.push(blankRow());render();}
+function addN(){let n=parseInt((document.getElementById('add-n')||{}).value,10);if(!(n>0))n=10;addRows(Math.min(n,300));}
+function appendBlank(){const i=rows.length;rows.push(blankRow());document.getElementById('tb').insertAdjacentHTML('beforeend',rowHtml(rows[i],i));summary();}
+function ensureTrailingBlank(){if(!rows.length||!isEmptyRow(rows[rows.length-1]))appendBlank();}
 
 /* ---------- validation ---------- */
 function isEmptyRow(r){return r.amount===''&&r.desc.trim()==='';}
@@ -177,7 +185,7 @@ function rowHtml(r,i){
   if(shared){
     paidCell=`<select data-i="${i}" data-f="paidBy">${['Thibaud','Chun'].map(m=>`<option ${m===r.paidBy?'selected':''}>${m}</option>`).join('')}</select>`;
     let sp=`<select class="${bad('split')}" data-i="${i}" data-f="split">${SPLITS.map(s=>`<option value="${s[0]}" ${s[0]===r.split?'selected':''}>${s[1]}</option>`).join('')}</select>`;
-    if(r.split==='custom')sp=`<div class="cust">${sp}<span class="cu">T&nbsp;$</span><input class="amt${bad('share')}" style="width:64px" data-i="${i}" data-f="share" value="${esc(r.share)}" inputmode="decimal"></div>`;
+    if(r.split==='custom')sp=`${sp}<div class="cust"><span class="cu">T&nbsp;$</span><input class="amt${bad('share')}" data-i="${i}" data-f="share" value="${esc(r.share)}" inputmode="decimal"></div>`;
     splitCell=sp;
   }else{
     const owner=b?b.members[0]:'';
@@ -219,10 +227,11 @@ function onEdit(e){
   const i=+t.dataset.i, f=t.dataset.f; if(f==='del')return;
   rows[i][f]=t.value;
   if(f==='book'||f==='split'){ // options / custom field change -> rebuild that row
-    const tr=t.closest('tr'); tr.outerHTML=rowHtml(rows[i],i); summary(); return;
+    const tr=t.closest('tr'); tr.outerHTML=rowHtml(rows[i],i); ensureTrailingBlank(); summary(); return;
   }
   // repaint just this row's validity without losing focus
   repaintRow(i);
+  ensureTrailingBlank();
 }
 function repaintRow(i){
   const v=validate(rows[i]);
@@ -236,9 +245,15 @@ function repaintRow(i){
   summary();
 }
 
-/* ---------- Enter = add row ---------- */
+/* ---------- Enter = jump to the cell below (grows the grid if needed) ---------- */
 document.addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&e.target.tagName==='INPUT'&&e.target.dataset&&e.target.dataset.i!==undefined){e.preventDefault();addRows(1);}
+  if(e.key!=='Enter')return;
+  const t=e.target; if(!t.dataset||t.dataset.i===undefined||t.dataset.f==='del')return;
+  e.preventDefault();
+  const i=+t.dataset.i, f=t.dataset.f;
+  ensureTrailingBlank();
+  const nextTr=document.getElementById('tb').children[i+1];
+  if(nextTr){const nx=nextTr.querySelector('[data-f="'+f+'"]');if(nx){nx.focus();if(nx.select)nx.select();}}
 });
 
 /* ---------- paste from spreadsheet ---------- */
