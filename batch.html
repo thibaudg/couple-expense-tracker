@@ -50,8 +50,8 @@
   .foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;flex-wrap:wrap;}
   .summary{font-size:13px;color:var(--sub);}
   .summary b{color:var(--txt);}
-  .cw-date{width:126px;} .cw-amt{width:88px;} .cw-cat{width:146px;} .cw-book{width:116px;}
-  .cw-paid{width:88px;} .cw-split{width:120px;} .cw-st{width:26px;} .cw-x{width:30px;}
+  .cw-date{width:122px;} .cw-amt{width:86px;} .cw-cat{width:140px;} .cw-book{width:112px;}
+  .cw-paid{width:86px;} .cw-split{width:116px;} .cw-st{width:24px;} .cw-x{width:28px;} .cw-type{width:92px;}
   td select,td input{max-width:100%;text-overflow:ellipsis;}
   .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--txt);color:#fff;
     font-weight:700;font-size:14px;padding:11px 18px;border-radius:22px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50;}
@@ -113,6 +113,7 @@
       <th class="cw-book">Book</th>
       <th class="cw-date">Date</th>
       <th class="cw-amt">Amount</th>
+      <th class="cw-type">Type</th>
       <th>Description</th>
       <th class="cw-cat">Category</th>
       <th class="cw-paid">Paid by</th>
@@ -151,7 +152,7 @@ function defBook(){const s=document.getElementById('def-book');return s?s.value:
 function blankRow(bookId){
   const last=rows[rows.length-1];
   const date=(last&&/^\d{4}-\d{2}-\d{2}$/.test(last.date))?last.date:today(); // carry the last date for same-day runs
-  return {id:gid(),book:bookId||defBook(),date:date,amount:'',desc:'',cat:'Groceries',paidBy:'Thibaud',split:'ours',share:''};
+  return {id:gid(),book:bookId||defBook(),date:date,amount:'',desc:'',cat:'Groceries',paidBy:'Thibaud',split:'ours',share:'',kind:'expense'};
 }
 function addRows(n){for(let i=0;i<n;i++)rows.push(blankRow());render();}
 function addN(){let n=parseInt((document.getElementById('add-n')||{}).value,10);if(!(n>0))n=10;addRows(Math.min(n,300));}
@@ -181,13 +182,13 @@ function dupInfo(r,i){
   if(isEmptyRow(r))return null;
   const amt=parseFloat(r.amount);
   if(!(amt>0)||!/^\d{4}-\d{2}-\d{2}$/.test(r.date))return null;
-  const key=amt.toFixed(2);
+  const key=(r.kind==='income'?'-':'')+amt.toFixed(2); // sign-aware: a $20 credit ≠ a $20 expense
   const cand=existingByAmt[key]||[];
   for(const m of cand){ if(daysBetween(r.date,m.date)<=3){const b=bookById(m.bookId);
     return {text:'Possible duplicate of “'+(m.desc||m.cat||'expense')+'” '+money(amt)+' · '+(b?b.name:m.bookId)+' · '+m.date}; } }
   for(let j=0;j<rows.length;j++){ if(j===i)continue; const o=rows[j];
-    if(isEmptyRow(o))continue; const oa=parseFloat(o.amount);
-    if(!(oa>0)||oa.toFixed(2)!==key||!/^\d{4}-\d{2}-\d{2}$/.test(o.date))continue;
+    if(isEmptyRow(o))continue; const oa=parseFloat(o.amount); if(!(oa>0)||!/^\d{4}-\d{2}-\d{2}$/.test(o.date))continue;
+    const oKey=(o.kind==='income'?'-':'')+oa.toFixed(2); if(oKey!==key)continue;
     if(daysBetween(r.date,o.date)<=3)return {text:'Possible duplicate of row '+(j+1)+' in this batch ('+money(amt)+')'}; }
   return null;
 }
@@ -215,6 +216,7 @@ function rowHtml(r,i){
     <td><select data-i="${i}" data-f="book">${bookOpts(r.book)}</select></td>
     <td><input class="${bad('date')}" type="date" data-i="${i}" data-f="date" value="${esc(r.date)}"></td>
     <td><input class="amt${bad('amount')}" data-i="${i}" data-f="amount" value="${esc(r.amount)}" placeholder="0.00" inputmode="decimal"></td>
+    <td><select data-i="${i}" data-f="kind"><option value="expense" ${r.kind!=='income'?'selected':''}>Expense</option><option value="income" ${r.kind==='income'?'selected':''}>Income</option></select></td>
     <td><input data-i="${i}" data-f="desc" value="${esc(r.desc)}" placeholder="What was it?"></td>
     <td><select class="${bad('cat')}" data-i="${i}" data-f="cat">${catOpts(r.cat)}</select></td>
     <td>${paidCell}</td>
@@ -316,7 +318,7 @@ document.addEventListener('paste',e=>{
 /* ---------- save ---------- */
 function buildDbRow(r){
   const b=bookById(r.book); const amt=Math.round(parseFloat(r.amount)*100)/100;
-  const row={id:gid(),book_id:b.id,date:r.date,description:(r.desc.trim()||r.cat),category:r.cat,amount:amt,kind:'expense',to_member:null};
+  const row={id:gid(),book_id:b.id,date:r.date,description:(r.desc.trim()||r.cat),category:r.cat,amount:amt,kind:(r.kind==='income'?'income':'expense'),to_member:null};
   if(b.type==='shared'){
     row.paid_by=r.paidBy; row.split=r.split; row.shares=null;
     if(r.split==='custom'){let s0=Math.min(Math.max(0,parseFloat(r.share)||0),amt);row.shares={Thibaud:Math.round(s0*100)/100,Chun:Math.round((amt-s0)*100)/100};}
@@ -335,7 +337,7 @@ async function saveAll(){
   btn.disabled=false;
   if(error){console.error(error);toast('Save failed — '+(error.message||'check connection'),true);summary();return;}
   // keep the just-saved rows in the dedupe index so later entries flag against them too
-  payload.forEach(p=>{if(p.kind!=='transfer'){const k=Number(p.amount).toFixed(2);(existingByAmt[k]=existingByAmt[k]||[]).push({bookId:p.book_id,date:p.date,desc:p.description,cat:p.category});}});
+  payload.forEach(p=>{if(p.kind!=='transfer'){const k=(p.kind==='income'?'-':'')+Number(p.amount).toFixed(2);(existingByAmt[k]=existingByAmt[k]||[]).push({bookId:p.book_id,date:p.date,desc:p.description,cat:p.category});}});
   // keep only rows that still need fixing, then top up with a few blanks
   rows=keep; while(rows.length<Math.max(5,keep.length))rows.push(blankRow());
   render();
@@ -357,7 +359,7 @@ async function fetchExisting(){
   if(error){console.error(error);return;} // dedupe just won't flag if this fails
   existing=(data||[]).filter(r=>r.kind!=='transfer');
   existingByAmt={};
-  existing.forEach(r=>{const k=Number(r.amount).toFixed(2);(existingByAmt[k]=existingByAmt[k]||[]).push({bookId:r.book_id,date:r.date,desc:r.description,cat:r.category});});
+  existing.forEach(r=>{const k=(r.kind==='income'?'-':'')+Number(r.amount).toFixed(2);(existingByAmt[k]=existingByAmt[k]||[]).push({bookId:r.book_id,date:r.date,desc:r.description,cat:r.category});});
 }
 async function boot(){
   await fetchBooks();

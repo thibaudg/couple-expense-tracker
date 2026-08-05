@@ -96,7 +96,7 @@
   .cat svg{width:21px;height:21px;color:var(--txt);}
   .cat .n{font-size:10.5px;color:var(--sub);margin-top:3px;line-height:1.1;font-weight:600;}
   /* pill row: Paid by · Split · Date (same height) */
-  .pillrow{display:flex;gap:8px;padding:8px 16px 2px;}
+  .pillrow{display:flex;flex-wrap:wrap;gap:8px;padding:8px 16px 2px;}
   .cpill{flex:1;min-width:0;height:42px;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--card);
     border:1px solid var(--line);border-radius:22px;padding:0 12px;font-size:13px;font-weight:700;color:var(--txt);cursor:pointer;}
   .cpill .plab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -306,15 +306,20 @@
     </div>
 
     <div class="pillrow" id="pillrow">
+      <button class="cpill" id="type-pill" onclick="toggleTypePanel()"></button>
       <button class="cpill hidden" id="paid-pill" onclick="cyclePaid()"></button>
       <button class="cpill hidden" id="split-pill" onclick="toggleSplitPanel()"></button>
       <div class="cpill datepill" id="date-pill"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9h16M8 3v4M16 3v4"/></svg><span class="plab" id="date-label">Today</span><input type="date" id="date-input" aria-label="Expense date" onchange="onDateChange()"></div>
+    </div>
+    <div class="split-panel hidden" id="type-panel">
+      <div class="sopt" data-t="expense" onclick="setType('expense')">Expense</div>
+      <div class="sopt" data-t="income" onclick="setType('income')">＋ Income (credit / refund)</div>
+      <div class="sopt" data-t="transfer" id="type-transfer" onclick="setType('transfer')">⇄ Transfer (settle up)</div>
     </div>
     <div class="split-panel hidden" id="split-panel">
       <div class="sopt" data-v="ours" onclick="pickSplit('ours')">50 / 50</div>
       <div class="sopt" data-v="mine" onclick="pickSplit('mine')">Just the payer</div>
       <div class="sopt" data-v="custom" onclick="pickSplit('custom')">Custom split…</div>
-      <div class="sopt" data-v="transfer" onclick="pickSplit('transfer')">⇄ Transfer (settle up)</div>
       <div class="customrow hidden" id="custom-split"></div>
     </div>
 
@@ -448,11 +453,14 @@ function resetDemo(){try{localStorage.removeItem(KEY);localStorage.removeItem('e
 function book(){return books.find(b=>b.id===curId);}
 function isShared(){return book().type==='shared';}
 
-function money(n){return '$'+n.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function money(n){return (n<0?'-$':'$')+Math.abs(n).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function signOf(e){return e.kind==='income'?-1:1;}            // income = a credit (negative)
+function signedAmount(e){return e.amount*signOf(e);}
 function shareOf(e,who){
-  if(e.split==='custom'&&e.shares)return e.shares[who]||0;
-  if(e.split==='solo'||e.split==='mine')return e.paidBy===who?e.amount:0;
-  return e.amount/2;
+  const s=signOf(e);
+  if(e.split==='custom'&&e.shares)return (e.shares[who]||0)*s;
+  if(e.split==='solo'||e.split==='mine')return e.paidBy===who?e.amount*s:0;
+  return (e.amount/2)*s;
 }
 function fmtDay(d){return new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
 function escapeHtml(s){return(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
@@ -461,7 +469,7 @@ function computeBalance(b){
   const M=b.members,paid={},owe={},xfer={};M.forEach(m=>{paid[m]=0;owe[m]=0;xfer[m]=0;});
   b.items.forEach(e=>{
     if(e.kind==='transfer'){ xfer[e.from]=(xfer[e.from]||0)+e.amount; xfer[e.to]=(xfer[e.to]||0)-e.amount; }
-    else { paid[e.paidBy]=(paid[e.paidBy]||0)+e.amount; M.forEach(m=>owe[m]+=shareOf(e,m)); }
+    else { paid[e.paidBy]=(paid[e.paidBy]||0)+signedAmount(e); M.forEach(m=>owe[m]+=shareOf(e,m)); }
   });
   return {M,paid,owe,xfer,net:(paid[M[0]]-owe[M[0]])+xfer[M[0]]};
 }
@@ -491,7 +499,7 @@ function renderList(){
   let items=[...b.items].sort((a,z)=>a.date<z.date?1:a.date>z.date?-1:0);
   if(view==='list'&&searchQuery)items=items.filter(e=>matchExp(e,searchQuery));
   let grand=0,my=0;
-  b.items.forEach(e=>{if(e.kind==='transfer')return;grand+=e.amount;my+=shareOf(e,me);});
+  b.items.forEach(e=>{if(e.kind==='transfer')return;grand+=signedAmount(e);my+=shareOf(e,me);});
   const sum=document.getElementById('summary');
   const bb=document.getElementById('balbar');
   if(isShared()){
@@ -515,13 +523,16 @@ function renderList(){
         <div class="ramt">${money(e.amount)}</div></div>`;
       return;
     }
-    const mine=(isShared()&&e.split==='mine')?`<span class="pill">${e.paidBy} only</span>`:'';
-    const meta=isShared()?`Paid by ${e.paidBy} · ${e.cat}`:e.cat;
+    const isInc=e.kind==='income';
+    const badge=isInc?`<span class="pill" style="background:#e3f4ea;color:var(--green)">credit</span>`
+      :((isShared()&&e.split==='mine')?`<span class="pill">${e.paidBy} only</span>`:'');
+    const meta=isShared()?`${isInc?'Received by':'Paid by'} ${e.paidBy} · ${e.cat}`:e.cat;
     const cc=CATCOLOR[e.cat]||CATCOLOR['Other'];
+    const amtHtml=isInc?`<span style="color:var(--green)">+${money(e.amount)}</span>`:money(e.amount);
     html+=`<div class="row" onclick="openEditor('${e.id}')">
       <div class="ico" style="background:${cc[0]};color:${cc[2]}">${svg(e.cat)}</div>
-      <div class="rmid"><div class="rdesc">${escapeHtml(e.desc||e.cat)}${mine}</div><div class="rmeta">${meta}</div></div>
-      <div class="ramt">${money(e.amount)}</div></div>`;
+      <div class="rmid"><div class="rdesc">${escapeHtml(e.desc||e.cat)}${badge}</div><div class="rmeta">${meta}</div></div>
+      <div class="ramt">${amtHtml}</div></div>`;
   });
   box.innerHTML=html;
 }
@@ -545,9 +556,10 @@ function openEditor(id){
       <div class="efield"><label>Date</label><input id="e-date" type="date" value="${e.date}"></div>
     </div>
     <div class="efield"><label>Name</label><input id="e-name" value="${escapeAttr(e.desc||'')}"></div>
-    <div class="efield hidden" id="e-typewrap"><label>Type</label><select id="e-kind" onchange="editorSync()">
-      <option value="expense" ${!isTr?'selected':''}>Expense</option>
-      <option value="transfer" ${isTr?'selected':''}>Transfer</option></select></div>
+    <div class="efield" id="e-typewrap"><label>Type</label><select id="e-kind" onchange="editorSync()">
+      <option value="expense" ${e.kind!=='transfer'&&e.kind!=='income'?'selected':''}>Expense</option>
+      <option value="income" ${e.kind==='income'?'selected':''}>Income (credit)</option>
+      <option value="transfer" id="e-opttr" ${isTr?'selected':''}>Transfer</option></select></div>
     <div class="efield hidden" id="e-transfer"><label>Direction</label><select id="e-dir">${dirOpts}</select></div>
     <div class="efield" id="e-catfield"><label>Category</label><select id="e-cat">${catOpts}</select></div>
     <div class="efield hidden" id="e-paidwrap"><label>Paid by</label><select id="e-paid">${paidOpts}</select></div>
@@ -567,9 +579,10 @@ function openEditor(id){
 function editorSync(){
   const bk=books.find(x=>x.id===document.getElementById('e-book').value);
   const shared=bk&&bk.type==='shared';
-  document.getElementById('e-typewrap').classList.toggle('hidden',!shared);
-  const kind=shared?document.getElementById('e-kind').value:'expense';
-  const isTr=shared&&kind==='transfer';
+  const opttr=document.getElementById('e-opttr');if(opttr)opttr.style.display=shared?'':'none';
+  let kind=document.getElementById('e-kind').value;
+  if(!shared&&kind==='transfer'){kind='expense';document.getElementById('e-kind').value='expense';}
+  const isTr=kind==='transfer';
   document.getElementById('e-transfer').classList.toggle('hidden',!isTr);
   document.getElementById('e-catfield').classList.toggle('hidden',isTr);
   document.getElementById('e-paidwrap').classList.toggle('hidden',!(shared&&!isTr));
@@ -587,7 +600,8 @@ function saveEditor(id){
   e.amount=Math.round(amt*100)/100;
   e.date=document.getElementById('e-date').value||e.date;
   const nm=(document.getElementById('e-name').value||'').trim();
-  const kind=shared?document.getElementById('e-kind').value:'expense';
+  let kind=document.getElementById('e-kind').value;
+  if(!shared&&kind==='transfer')kind='expense';
   if(kind==='transfer'){
     e.kind='transfer';
     const fr=document.getElementById('e-dir').value;
@@ -595,7 +609,7 @@ function saveEditor(id){
     e.desc=nm||'Transfer';
     delete e.cat;delete e.paidBy;delete e.split;delete e.shares;
   }else{
-    e.kind='expense';
+    e.kind=kind; // 'expense' or 'income'
     e.cat=document.getElementById('e-cat').value;
     e.desc=nm||e.cat;
     delete e.from;delete e.to;
@@ -654,7 +668,7 @@ function renderBal(){
 function newDraft(){
   const iso=new Date().toISOString().slice(0,10);
   draft={kind:'expense',cat:'Groceries',paidBy:me,split:'ours',date:iso,isToday:true,customShare:null,from:null,to:null};
-  splitPanelOpen=false;
+  splitPanelOpen=false;typePanelOpen=false;
   const ai=document.getElementById('amt-input');if(ai)ai.value='';
   const ni=document.getElementById('name-input');if(ni)ni.value='';
 }
@@ -670,44 +684,59 @@ function renderCatGrid(){
     return `<div class="cat${on?' on':''}" style="${style}" onclick="setCat(this.dataset.c)" data-c="${escapeHtml(n)}">${svg(n)}<div class="n"${nstyle}>${n}</div></div>`;
   }).join('');
 }
-let splitPanelOpen=false;
+let splitPanelOpen=false, typePanelOpen=false;
 function splitLabel(s){return s==='ours'?'50 / 50':s==='mine'?'Just '+draft.paidBy:'Custom';}
+function typeLabel(k){return k==='income'?'Income':k==='transfer'?'Transfer':'Expense';}
 function renderPills(){
   const isTransfer=isShared()&&draft.kind==='transfer';
-  document.getElementById('paid-pill').innerHTML=`<span class="plab">${isTransfer?'From · '+draft.from:'Paid · '+draft.paidBy}</span><span class="chev">▾</span>`;
-  document.getElementById('split-pill').innerHTML=`<span class="plab">${isTransfer?'⇄ Transfer':splitLabel(draft.split)}</span><span class="chev">▾</span>`;
+  const paidWord=isTransfer?'From · '+draft.from:(draft.kind==='income'?'Received · '+draft.paidBy:'Paid · '+draft.paidBy);
+  document.getElementById('paid-pill').innerHTML=`<span class="plab">${paidWord}</span><span class="chev">▾</span>`;
+  document.getElementById('split-pill').innerHTML=`<span class="plab">${splitLabel(draft.split)}</span><span class="chev">▾</span>`;
 }
-function toggleSplitPanel(){splitPanelOpen=!splitPanelOpen;renderDraft();}
+function toggleSplitPanel(){splitPanelOpen=!splitPanelOpen;if(splitPanelOpen)typePanelOpen=false;renderDraft();}
+function toggleTypePanel(){typePanelOpen=!typePanelOpen;if(typePanelOpen)splitPanelOpen=false;renderDraft();}
+function setType(v){
+  if(v==='transfer'&&!isShared())return; // no transfers in solo books
+  draft.kind=v;
+  if(v==='transfer'&&!draft.from){draft.from=draft.paidBy||me;draft.to=otherMember(draft.from);}
+  typePanelOpen=false;
+  renderDraft();
+}
 function cyclePaid(){
   if(isShared()&&draft.kind==='transfer'){draft.from=otherMember(draft.from);draft.to=otherMember(draft.from);}
   else draft.paidBy=otherMember(draft.paidBy);
   renderDraft();
 }
 function pickSplit(v){
-  if(v==='transfer'){draft.kind='transfer';if(!draft.from){draft.from=draft.paidBy||me;draft.to=otherMember(draft.from);}splitPanelOpen=false;}
-  else{draft.kind='expense';draft.split=v;if(v==='custom'){if(draft.customShare==null)draft.customShare=+((amountVal()||0)/2).toFixed(2);splitPanelOpen=true;}else splitPanelOpen=false;}
+  draft.split=v;
+  if(v==='custom'){if(draft.customShare==null)draft.customShare=+((amountVal()||0)/2).toFixed(2);splitPanelOpen=true;}
+  else splitPanelOpen=false;
   renderDraft();
 }
 function renderDraft(){
   const shared=isShared();
   const isTransfer=shared&&draft.kind==='transfer';
+  const showSplit=shared&&!isTransfer;
+  // type pill (always) + its panel
+  document.getElementById('type-pill').innerHTML=`<span class="plab">${typeLabel(draft.kind)}</span><span class="chev">▾</span>`;
+  document.getElementById('type-transfer').classList.toggle('hidden',!shared);
+  const tpanel=document.getElementById('type-panel');
+  tpanel.classList.toggle('hidden',!typePanelOpen);
+  document.querySelectorAll('#type-panel .sopt').forEach(o=>o.classList.toggle('on',o.dataset.t===draft.kind));
   document.getElementById('paid-pill').classList.toggle('hidden',!shared);
-  document.getElementById('split-pill').classList.toggle('hidden',!shared);
+  document.getElementById('split-pill').classList.toggle('hidden',!showSplit);
   document.getElementById('category-block').classList.toggle('hidden',isTransfer);
   const cs=document.getElementById('custom-split');
   const panel=document.getElementById('split-panel');
   if(shared){
     if(isTransfer&&!draft.from){draft.from=me;draft.to=otherMember(me);}
     renderPills();
-    panel.classList.toggle('hidden',!splitPanelOpen);
-    document.querySelectorAll('#split-panel .sopt').forEach(o=>{
-      const on=(o.dataset.v==='transfer')?isTransfer:(!isTransfer&&o.dataset.v===draft.split);
-      o.classList.toggle('on',on);
-    });
-    if(splitPanelOpen&&!isTransfer&&draft.split==='custom'){cs.classList.remove('hidden');renderCustomRow();}
+    panel.classList.toggle('hidden',!(splitPanelOpen&&showSplit));
+    document.querySelectorAll('#split-panel .sopt').forEach(o=>o.classList.toggle('on',o.dataset.v===draft.split));
+    if(splitPanelOpen&&showSplit&&draft.split==='custom'){cs.classList.remove('hidden');renderCustomRow();}
     else cs.classList.add('hidden');
   }else{cs.classList.add('hidden');panel.classList.add('hidden');}
-  document.getElementById('save-label').textContent=isTransfer?'Save transfer':'Save expense';
+  document.getElementById('save-label').textContent=isTransfer?'Save transfer':(draft.kind==='income'?'Save income':'Save expense');
   document.getElementById('date-label').textContent=draft.isToday?'Today':fmtDay(draft.date);
   const di=document.getElementById('date-input');if(di)di.value=draft.date;
   renderCatGrid();
@@ -749,7 +778,7 @@ function save(){
     const from=draft.from||me, to=draft.to||otherMember(from);
     item={id:'x'+Date.now(),kind:'transfer',date:draft.date,from:from,to:to,amount:amt,desc:nm||'Transfer'};
   }else{
-    item={id:'x'+Date.now(),kind:'expense',date:draft.date,desc:nm||draft.cat,cat:draft.cat,amount:amt};
+    item={id:'x'+Date.now(),kind:(draft.kind==='income'?'income':'expense'),date:draft.date,desc:nm||draft.cat,cat:draft.cat,amount:amt};
     if(isShared()){
       item.paidBy=draft.paidBy;item.split=draft.split;
       if(draft.split==='custom'){
@@ -803,7 +832,7 @@ function renderBooks(){
   if(fb)fb.classList.remove('hidden');
   let html='';
   books.forEach(b=>{
-    const total=b.items.reduce((s,e)=>s+e.amount,0);
+    const total=b.items.reduce((s,e)=>e.kind==='transfer'?s:s+signedAmount(e),0);
     const sub=b.type==='shared'?balanceText(b):b.members[0]+' · personal';
     html+=`<div class="bookcard${b.id===curId?' on':''}" onclick="chooseBookGo('${b.id}')">
       <div class="bi">${bookIcon(b)}</div>
@@ -985,20 +1014,21 @@ function renderInsights(){
   let plabel=insScopeV==='month'?fmtMonthFull(insPeriod):insScopeV==='year'?insPeriod:'All time';
   let deltaHtml='';
   if(insScopeV!=='all'){const pp=prevPeriod(insScopeV,insPeriod);if(pp){const prevTot=insSum(periodPred(insScopeV,pp)).tot;if(prevTot>0){const d=(tot-prevTot)/prevTot*100;const cls=Math.abs(d)<0.5?'flat':d<0?'down':'up';const arrow=d<-0.5?'▼':d>0.5?'▲':'▬';const plab=insScopeV==='month'?fmtMonShort(pp):pp;deltaHtml=`<span class="delta ${cls}">${arrow} ${Math.abs(Math.round(d))}% vs ${plab}</span>`;}}}
-  const rows=trendRows();const maxT=Math.max(...rows.map(r=>r.total),1);const selBooks=insSelectedBooks();
+  const rows=trendRows();const maxT=Math.max(...rows.map(r=>Math.max(r.total,0)),1);const selBooks=insSelectedBooks();
   const bars=rows.map(r=>{
     const sel=(insScopeV==='month'&&r.period===insPeriod);
-    const h=Math.max(Math.round(r.total/maxT*60),r.total>0?4:2);
-    let segs='';selBooks.forEach(b=>{const v=r.per[b.id]||0;if(v<=0)return;const pct=Math.round(v/(r.total||1)*100);segs+=`<span class="seg" style="height:${pct}%;background:${insBookColor(b.id)}"></span>`;});
+    const h=Math.max(Math.round(Math.max(r.total,0)/maxT*60),r.total>0?4:2);
+    const posSum=selBooks.reduce((s,b)=>s+Math.max(r.per[b.id]||0,0),0)||1; // net-negative periods: stack positive spend only
+    let segs='';selBooks.forEach(b=>{const v=r.per[b.id]||0;if(v<=0)return;const pct=Math.round(v/posSum*100);segs+=`<span class="seg" style="height:${pct}%;background:${insBookColor(b.id)}"></span>`;});
     const lab=(insScopeV==='all')?r.period:fmtMonShort(r.period);
     return `<div class="tb${sel?' sel':''}" onclick="insBarTap('${r.period}')"><div class="stack" style="height:${h}px">${segs}</div><span class="tl">${lab}</span></div>`;
   }).join('');
   const cap=insScopeV==='month'?'tap a bar to change month':insScopeV==='year'?'tap a month to drill in':'tap a year to drill in';
   const legend=selBooks.map(b=>`<span class="lg"><span class="sw" style="background:${insBookColor(b.id)}"></span>${escapeHtml(b.name)}</span>`).join('');
-  const cats=Object.keys(byCat).sort((a,z)=>byCat[z]-byCat[a]);const maxC=Math.max(...cats.map(c=>byCat[c]),1);
+  const cats=Object.keys(byCat).sort((a,z)=>byCat[z]-byCat[a]);const maxC=Math.max(...cats.map(c=>Math.max(byCat[c],0)),1);
   let catHtml;
   if(!cats.length)catHtml=`<div class="ins-empty">No spending for ${escapeHtml(insPerson)} in ${escapeHtml(plabel)}.</div>`;
-  else catHtml=cats.map(c=>{const cc=CATCOLOR[c]||CATCOLOR['Other'];const w=Math.round(byCat[c]/maxC*100);const avg=showAvg?`<span class="cavg">${money(byCat[c]/nMonths)}/mo</span>`:'';return `<div class="catrow" onclick="openCatDetail('${escapeAttr(c)}')"><span class="cico" style="background:${cc[0]};color:${cc[2]}">${svg(c)}</span><div class="cmid"><div class="ctop"><span>${escapeHtml(c)}</span><span class="cright"><span class="camt">${money(byCat[c])}</span>${avg}</span></div><div class="cbar" style="width:${w}%;background:${cc[2]}"></div></div><span class="cchev">›</span></div>`;}).join('');
+  else catHtml=cats.map(c=>{const cc=CATCOLOR[c]||CATCOLOR['Other'];const w=Math.max(0,Math.round(byCat[c]/maxC*100));const avg=showAvg?`<span class="cavg">${money(byCat[c]/nMonths)}/mo</span>`:'';return `<div class="catrow" onclick="openCatDetail('${escapeAttr(c)}')"><span class="cico" style="background:${cc[0]};color:${cc[2]}">${svg(c)}</span><div class="cmid"><div class="ctop"><span>${escapeHtml(c)}</span><span class="cright"><span class="camt">${money(byCat[c])}</span>${avg}</span></div><div class="cbar" style="width:${w}%;background:${cc[2]}"></div></div><span class="cchev">›</span></div>`;}).join('');
   const dis=insScopeV==='all'?'disabled':'';
   body.innerHTML=`<div class="inscard">
       <div class="insstep"><button class="nav" ${dis} onclick="insStep(-1)">‹</button><span class="plabel">${escapeHtml(plabel)}</span><button class="nav" ${dis} onclick="insStep(1)">›</button></div>
@@ -1061,7 +1091,7 @@ document.getElementById('name-input').addEventListener('keydown',e=>{if(e.key===
 
 /* ---------- cloud sync ---------- */
 function toRow(item,bookId){return {id:item.id,book_id:bookId,date:item.date,description:item.desc||null,category:item.cat||null,amount:item.amount,paid_by:(item.paidBy||item.from)||null,split:item.split||null,shares:item.shares||null,kind:item.kind||'expense',to_member:item.to||null};}
-function fromRow(r){if(r.kind==='transfer')return {id:r.id,kind:'transfer',date:r.date,from:r.paid_by,to:r.to_member,amount:Number(r.amount),desc:r.description};const it={id:r.id,kind:'expense',date:r.date,desc:r.description,cat:r.category,amount:Number(r.amount),paidBy:r.paid_by,split:r.split};if(r.shares)it.shares=r.shares;return it;}
+function fromRow(r){if(r.kind==='transfer')return {id:r.id,kind:'transfer',date:r.date,from:r.paid_by,to:r.to_member,amount:Number(r.amount),desc:r.description};const it={id:r.id,kind:(r.kind==='income'?'income':'expense'),date:r.date,desc:r.description,cat:r.category,amount:Number(r.amount),paidBy:r.paid_by,split:r.split};if(r.shares)it.shares=r.shares;return it;}
 async function cloudInsertExpense(item,bookId){const {error}=await supa.from('expenses').insert(toRow(item,bookId));if(error)cloudWarn(error);}
 async function cloudUpsertExpense(item,bookId){const {error}=await supa.from('expenses').update(toRow(item,bookId||curId)).eq('id',item.id);if(error)cloudWarn(error);}
 async function cloudDeleteExpense(id){const {error}=await supa.from('expenses').delete().eq('id',id);if(error)cloudWarn(error);}
