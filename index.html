@@ -80,8 +80,17 @@
   .amount-input{border:0;background:transparent;outline:none;font-family:inherit;font-size:48px;font-weight:800;
     letter-spacing:-1.5px;text-align:center;color:var(--txt);width:100%;max-width:260px;padding:0;}
   .amount-input::placeholder{color:var(--muted);}
-  .namewrap{padding:0 16px 2px;}
-  .nameinput{width:100%;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:13px 14px;
+  .namewrap{display:flex;align-items:stretch;gap:8px;padding:0 16px 2px;}
+  .typebtn{flex:0 0 auto;display:flex;align-items:center;gap:3px;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:0 11px;color:var(--sub);cursor:pointer;font-size:13px;font-weight:700;}
+  .typebtn svg{width:19px;height:19px;color:var(--sub);}
+  .typebtn .chev{color:var(--muted);font-size:11px;}
+  .typebtn .tlab{font-size:13px;}
+  .typebtn.inc{background:#e2f4ea;border-color:#b7e0c6;color:var(--green);}
+  .typebtn.inc svg{color:var(--green);}
+  .typebtn.tr{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent);}
+  .typebtn.tr svg{color:var(--accent);}
+  .nameinput{flex:1;min-width:0;width:100%;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:13px 14px;
     font-size:15px;font-family:inherit;color:var(--txt);outline:none;}
   .nameinput:focus{border-color:var(--accent-line);}
   .nameinput::placeholder{color:var(--muted);}
@@ -299,22 +308,24 @@
   <section id="view-add">
     <div class="amount-wrap"><span class="cur">$</span><input id="amt-input" class="amount-input" inputmode="decimal" enterkeyhint="next" placeholder="0" autocomplete="off"></div>
 
-    <div class="namewrap"><input id="name-input" class="nameinput" enterkeyhint="done" placeholder="What was it? — e.g. Nofrills" autocomplete="off"></div>
+    <div class="namewrap">
+      <button class="typebtn" id="type-pill" onclick="toggleTypePanel()" aria-label="Type"></button>
+      <input id="name-input" class="nameinput" enterkeyhint="done" placeholder="What was it? — e.g. Nofrills" autocomplete="off">
+    </div>
+    <div class="split-panel hidden" id="type-panel">
+      <div class="sopt" data-t="expense" onclick="setType('expense')">Expense</div>
+      <div class="sopt" data-t="income" onclick="setType('income')">＋ Income (credit / refund)</div>
+      <div class="sopt" data-t="transfer" id="type-transfer" onclick="setType('transfer')">⇄ Transfer (settle up)</div>
+    </div>
 
     <div id="category-block">
       <div class="catgrid" id="catgrid"></div>
     </div>
 
     <div class="pillrow" id="pillrow">
-      <button class="cpill" id="type-pill" onclick="toggleTypePanel()"></button>
       <button class="cpill hidden" id="paid-pill" onclick="cyclePaid()"></button>
       <button class="cpill hidden" id="split-pill" onclick="toggleSplitPanel()"></button>
       <div class="cpill datepill" id="date-pill"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9h16M8 3v4M16 3v4"/></svg><span class="plab" id="date-label">Today</span><input type="date" id="date-input" aria-label="Expense date" onchange="onDateChange()"></div>
-    </div>
-    <div class="split-panel hidden" id="type-panel">
-      <div class="sopt" data-t="expense" onclick="setType('expense')">Expense</div>
-      <div class="sopt" data-t="income" onclick="setType('income')">＋ Income (credit / refund)</div>
-      <div class="sopt" data-t="transfer" id="type-transfer" onclick="setType('transfer')">⇄ Transfer (settle up)</div>
     </div>
     <div class="split-panel hidden" id="split-panel">
       <div class="sopt" data-v="ours" onclick="pickSplit('ours')">50 / 50</div>
@@ -486,7 +497,7 @@ function renderAppbar(){
   document.getElementById('book-name').textContent=b.name;
   document.getElementById('book-emoji').innerHTML=bookIcon(b);
   const w=document.getElementById('whoami');
-  if(view==='list'&&isShared()){w.classList.remove('hidden');document.getElementById('me-name').textContent=me;}
+  if((view==='list'||view==='add')&&isShared()){w.classList.remove('hidden');document.getElementById('me-name').textContent=me;}
   else w.classList.add('hidden');
   document.getElementById('search-btn').classList.toggle('hidden',view!=='list');
   document.getElementById('book-menu-btn').classList.toggle('hidden',view!=='list');
@@ -687,6 +698,17 @@ function renderCatGrid(){
 let splitPanelOpen=false, typePanelOpen=false;
 function splitLabel(s){return s==='ours'?'50 / 50':s==='mine'?'Just '+draft.paidBy:'Custom';}
 function typeLabel(k){return k==='income'?'Income':k==='transfer'?'Transfer':'Expense';}
+const TYPEIC={
+  expense:'<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8.5h6M9 12.5h6"/></svg>',
+  income:'<svg viewBox="0 0 24 24"><path d="M12 3.5v9M8.5 9l3.5 3.5L15.5 9"/><path d="M5 14.5v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></svg>',
+  transfer:'<svg viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>'};
+function renderTypeBtn(){
+  const tp=document.getElementById('type-pill');
+  tp.className='typebtn'+(draft.kind==='income'?' inc':draft.kind==='transfer'?' tr':'');
+  if(draft.kind==='income')tp.innerHTML=TYPEIC.income+'<span class="tlab">Income</span><span class="chev">▾</span>';
+  else if(draft.kind==='transfer')tp.innerHTML=TYPEIC.transfer+'<span class="tlab">Transfer</span><span class="chev">▾</span>';
+  else tp.innerHTML=TYPEIC.expense+'<span class="chev">▾</span>';
+}
 function renderPills(){
   const isTransfer=isShared()&&draft.kind==='transfer';
   const paidWord=isTransfer?'From · '+draft.from:(draft.kind==='income'?'Received · '+draft.paidBy:'Paid · '+draft.paidBy);
@@ -718,7 +740,7 @@ function renderDraft(){
   const isTransfer=shared&&draft.kind==='transfer';
   const showSplit=shared&&!isTransfer;
   // type pill (always) + its panel
-  document.getElementById('type-pill').innerHTML=`<span class="plab">${typeLabel(draft.kind)}</span><span class="chev">▾</span>`;
+  renderTypeBtn();
   document.getElementById('type-transfer').classList.toggle('hidden',!shared);
   const tpanel=document.getElementById('type-panel');
   tpanel.classList.toggle('hidden',!typePanelOpen);
@@ -1076,7 +1098,14 @@ function go(v){
   if(v==='catdetail')renderCatDetail();
   renderAppbar();window.scrollTo(0,0);
 }
-function toggleMe(){const M=book().members;me=me===M[0]?M[1]:M[0];document.getElementById('me-name').textContent=me;renderList();}
+function toggleMe(){
+  const M=book().members;me=me===M[0]?M[1]:M[0];document.getElementById('me-name').textContent=me;
+  if(view==='add'){                                   // person pill also sets the default payer
+    if(draft.kind==='transfer'){draft.from=me;draft.to=otherMember(me);}
+    else draft.paidBy=me;
+    renderDraft();
+  } else renderList();
+}
 function toast(m){const t=document.getElementById('toast');t.classList.remove('act');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1400);}
 function toastUndo(msg){const t=document.getElementById('toast');t.innerHTML=`${msg} <button class="undo" onclick="undoDelete()">Undo</button>`;t.classList.add('show','act');clearTimeout(t._t);t._t=setTimeout(()=>{t.classList.remove('show','act');t.textContent='Saved';lastDeleted=null;},4500);}
 function renderAll(){renderAppbar();if(view==='list')renderList();if(view==='bal')renderBal();if(view==='books')renderBooks();if(view==='insights')renderInsights();if(view==='catdetail')renderCatDetail();}

@@ -43,6 +43,13 @@
   .dot.ok{background:var(--green);}
   .dot.err{background:var(--red);}
   .dot.dup{background:var(--amber);cursor:help;}
+  .dupdetail td{background:#fdf6e9;border-top:0;padding:5px 10px 9px;}
+  .dupbox{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:#7a5b12;}
+  .dupbox .dwarn{font-weight:800;color:var(--amber);}
+  .dupbox .dm i{font-style:normal;color:var(--muted);margin-right:3px;}
+  .dupbox .dacts{margin-left:auto;display:flex;gap:6px;flex:0 0 auto;}
+  .dupbox .dacts button{font-size:12px;font-weight:700;padding:5px 10px;border-radius:7px;}
+  .dupbox .dacts .drm{color:var(--red);border-color:#eab9b3;}
   .del{border:0;background:0;color:var(--muted);font-size:16px;cursor:pointer;padding:2px 6px;line-height:1;}
   .del:hover{color:var(--red);}
   .cust{display:flex;align-items:center;gap:4px;margin-top:3px;}
@@ -104,7 +111,7 @@
   <div class="hint">
     Type rows, or <b>paste from Excel / Google&nbsp;Sheets</b> (Cmd+V anywhere) — column order:
     <b>Date · Amount · Description · Category · Paid by · Split</b>. Missing columns use sensible defaults.
-    Tab moves across, Enter moves down — a fresh row always waits at the bottom, so just keep typing (or use “Add rows” for a big batch). Empty rows are ignored; red = a problem (skipped on save); <b style="color:var(--amber)">amber = possible duplicate</b> (same amount within ±3 days, any book — hover the dot to see the match).
+    Tab moves across, Enter moves down — a fresh row always waits at the bottom, so just keep typing (or use “Add rows” for a big batch). Empty rows are ignored; red = a problem (skipped on save); <b style="color:var(--amber)">amber = possible duplicate</b> (same amount within ±3 days, any book) — the match is shown in a strip under the row, where you can <b>Remove row</b> or mark it <b>Not a duplicate</b>.
   </div>
 
   <table>
@@ -178,19 +185,33 @@ function validate(r){
 
 /* ---------- duplicate detection (same amount, any book, within ±3 days) ---------- */
 function daysBetween(a,b){return Math.abs((Date.parse(a)-Date.parse(b))/86400000);}
-function dupInfo(r,i){
-  if(isEmptyRow(r))return null;
+function dupMatches(r,i){
+  if(isEmptyRow(r))return [];
   const amt=parseFloat(r.amount);
-  if(!(amt>0)||!/^\d{4}-\d{2}-\d{2}$/.test(r.date))return null;
+  if(!(amt>0)||!/^\d{4}-\d{2}-\d{2}$/.test(r.date))return [];
   const key=(r.kind==='income'?'-':'')+amt.toFixed(2); // sign-aware: a $20 credit ≠ a $20 expense
-  const cand=existingByAmt[key]||[];
-  for(const m of cand){ if(daysBetween(r.date,m.date)<=3){const b=bookById(m.bookId);
-    return {text:'Possible duplicate of “'+(m.desc||m.cat||'expense')+'” '+money(amt)+' · '+(b?b.name:m.bookId)+' · '+m.date}; } }
+  const out=[];
+  (existingByAmt[key]||[]).forEach(m=>{ if(daysBetween(r.date,m.date)<=3){const b=bookById(m.bookId);
+    out.push({type:'db',desc:m.desc||m.cat||'expense',amount:amt,income:r.kind==='income',book:(b?b.name:m.bookId),date:m.date}); } });
   for(let j=0;j<rows.length;j++){ if(j===i)continue; const o=rows[j];
     if(isEmptyRow(o))continue; const oa=parseFloat(o.amount); if(!(oa>0)||!/^\d{4}-\d{2}-\d{2}$/.test(o.date))continue;
     const oKey=(o.kind==='income'?'-':'')+oa.toFixed(2); if(oKey!==key)continue;
-    if(daysBetween(r.date,o.date)<=3)return {text:'Possible duplicate of row '+(j+1)+' in this batch ('+money(amt)+')'}; }
-  return null;
+    if(daysBetween(r.date,o.date)<=3)out.push({type:'batch',row:j+1,desc:o.desc||o.cat||'this batch',amount:oa,date:o.date}); }
+  return out;
+}
+function isDup(r,i){return !r.dupOk && dupMatches(r,i).length>0;}
+function detailHtml(r,i){
+  if(!isDup(r,i))return '';
+  const ms=dupMatches(r,i).slice(0,4).map(m=> m.type==='db'
+    ? `<span class="dm"><i>already saved:</i> ${esc(m.desc)} · ${m.income?'+':''}${money(m.amount)} · ${esc(m.book)} · ${m.date}</span>`
+    : `<span class="dm"><i>row ${m.row} in this batch:</i> ${esc(m.desc)} · ${money(m.amount)} · ${m.date}</span>`
+  ).join('');
+  return `<tr class="dupdetail" data-detail="${i}"><td></td><td colspan="9"><div class="dupbox"><span class="dwarn">⚠ Possible duplicate</span>${ms}<span class="dacts"><button data-i="${i}" data-f="dupkeep">Not a duplicate</button><button class="drm" data-i="${i}" data-f="duprm">Remove row</button></span></div></td></tr>`;
+}
+function refreshDetails(){
+  const tb=document.getElementById('tb');
+  tb.querySelectorAll('tr.dupdetail').forEach(el=>el.remove());
+  rows.forEach((r,i)=>{ if(isDup(r,i)){const main=tb.querySelector('tr.mainrow[data-row="'+i+'"]');if(main)main.insertAdjacentHTML('afterend',detailHtml(r,i));} });
 }
 
 /* ---------- render ---------- */
@@ -211,7 +232,7 @@ function rowHtml(r,i){
     paidCell=`<span style="font-size:13px;color:var(--sub)">${esc(owner)}</span>`;
     splitCell=`<span style="font-size:13px;color:var(--muted)">— personal —</span>`;
   }
-  return `<tr>
+  return `<tr class="mainrow" data-row="${i}">
     <td class="st">${dot}</td>
     <td><select data-i="${i}" data-f="book">${bookOpts(r.book)}</select></td>
     <td><input class="${bad('date')}" type="date" data-i="${i}" data-f="date" value="${esc(r.date)}"></td>
@@ -225,21 +246,22 @@ function rowHtml(r,i){
   </tr>`;
 }
 function render(){
-  document.getElementById('tb').innerHTML=rows.map(rowHtml).join('');
+  document.getElementById('tb').innerHTML=rows.map((r,i)=>rowHtml(r,i)).join('');
   summary();
 }
 function summary(){
-  const trs=document.getElementById('tb').children;
+  const tb=document.getElementById('tb');
   let ready=0,err=0,empty=0,dup=0,tot=0;
   rows.forEach((r,i)=>{
-    const v=validate(r); const tr=trs[i]; const dot=tr?tr.querySelector('.dot'):null;
+    const main=tb.querySelector('tr.mainrow[data-row="'+i+'"]'); const dot=main?main.querySelector('.dot'):null;
+    const v=validate(r);
     if(v.empty){empty++;if(dot){dot.className='dot';dot.title='';}return;}
     if(v.bad.length){err++;if(dot){dot.className='dot err';dot.title=v.bad.join(', ');}return;}
     ready++; tot+=parseFloat(r.amount)||0;
-    const dn=dupInfo(r,i);
-    if(dn){dup++;if(dot){dot.className='dot dup';dot.title=dn.text;}}
+    if(isDup(r,i)){dup++;if(dot){dot.className='dot dup';dot.title='possible duplicate — see below';}}
     else if(dot){dot.className='dot ok';dot.title='';}
   });
+  refreshDetails();
   const el=document.getElementById('summary');
   el.innerHTML=`<b>${ready}</b> ready · <b>${tot?money(tot):'$0.00'}</b>`
     + (dup?` &nbsp;·&nbsp; <span style="color:var(--amber)"><b>${dup}</b> possible dup${dup>1?'s':''}</span>`:'')
@@ -252,27 +274,29 @@ function summary(){
 document.getElementById('tb').addEventListener('input',onEdit);
 document.getElementById('tb').addEventListener('change',onEdit);
 document.getElementById('tb').addEventListener('click',function(e){
-  const t=e.target; if(t.dataset&&t.dataset.f==='del'){rows.splice(+t.dataset.i,1);if(!rows.length)rows.push(blankRow());render();}
+  const t=e.target; if(!t.dataset)return; const f=t.dataset.f;
+  if(f==='del'||f==='duprm'){rows.splice(+t.dataset.i,1);if(!rows.length)rows.push(blankRow());render();}
+  else if(f==='dupkeep'){rows[+t.dataset.i].dupOk=true;summary();}
 });
 function onEdit(e){
   const t=e.target; if(!t.dataset||t.dataset.i===undefined)return;
   const i=+t.dataset.i, f=t.dataset.f; if(f==='del')return;
   rows[i][f]=t.value;
-  if(f==='book'||f==='split'){ // options / custom field change -> rebuild that row
-    const tr=t.closest('tr'); tr.outerHTML=rowHtml(rows[i],i); ensureTrailingBlank(); summary(); return;
+  if(['amount','date','book','kind'].indexOf(f)>=0)rows[i].dupOk=false; // a real change re-checks duplicates
+  if(f==='book'||f==='split'||f==='kind'){ // options / custom field change -> rebuild that row
+    const tr=t.closest('tr.mainrow'); tr.outerHTML=rowHtml(rows[i],i); ensureTrailingBlank(); summary(); return;
   }
-  // repaint just this row's validity without losing focus
   repaintRow(i);
   ensureTrailingBlank();
 }
 function repaintRow(i){
   const v=validate(rows[i]);
-  const tr=document.getElementById('tb').children[i]; if(!tr)return;
+  const tr=document.getElementById('tb').querySelector('tr.mainrow[data-row="'+i+'"]'); if(!tr)return;
   tr.querySelectorAll('[data-f]').forEach(el=>{
     const f=el.dataset.f; if(f==='del'||f==='book')return;
     el.classList.toggle('bad', v.bad.indexOf(f)>=0);
   });
-  summary(); // repaints all status dots (incl. duplicate flags) + footer
+  summary(); // repaints all status dots + duplicate detail rows + footer
 }
 
 /* ---------- Enter = jump to the cell below (grows the grid if needed) ---------- */
@@ -282,7 +306,7 @@ document.addEventListener('keydown',e=>{
   e.preventDefault();
   const i=+t.dataset.i, f=t.dataset.f;
   ensureTrailingBlank();
-  const nextTr=document.getElementById('tb').children[i+1];
+  const nextTr=document.getElementById('tb').querySelector('tr.mainrow[data-row="'+(i+1)+'"]');
   if(nextTr){const nx=nextTr.querySelector('[data-f="'+f+'"]');if(nx){nx.focus();if(nx.select)nx.select();}}
 });
 
@@ -328,7 +352,7 @@ function buildDbRow(r){
 async function saveAll(){
   const valid=[],keep=[];
   let errs=0,dupN=0;
-  rows.forEach((r,i)=>{const v=validate(r);if(v.empty)return;if(v.bad.length){errs++;keep.push(r);return;}if(dupInfo(r,i))dupN++;valid.push(r);});
+  rows.forEach((r,i)=>{const v=validate(r);if(v.empty)return;if(v.bad.length){errs++;keep.push(r);return;}if(isDup(r,i))dupN++;valid.push(r);});
   if(!valid.length){toast(errs?'Fix the highlighted rows first':'Nothing to save',true);return;}
   if(dupN>0 && !confirm(dupN+' row'+(dupN>1?'s':'')+' look like possible duplicates (amber). Save all '+valid.length+' anyway?'))return;
   const btn=document.getElementById('save-btn');btn.disabled=true;btn.textContent='Saving…';
