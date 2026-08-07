@@ -36,14 +36,27 @@
   .bookchip .bemoji{flex:0 0 auto;display:inline-flex;}
   .bookchip .bemoji svg{width:18px;height:18px;color:var(--accent);}
   .appbar-right{display:flex;align-items:center;gap:8px;flex:0 0 auto;}
-  .whoami{background:var(--card);border:1px solid var(--line);color:var(--txt);font-size:13px;
-    font-weight:600;padding:8px 12px;border-radius:20px;display:flex;align-items:center;gap:6px;}
+  .whoami{background:var(--card);border:1px solid var(--line);color:var(--txt);font-size:14px;
+    font-weight:700;padding:9px 13px;border-radius:22px;display:flex;align-items:center;gap:6px;}
   .whoami .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);}
-  /* summary */
-  .summary{display:flex;gap:12px;padding:4px 16px 14px;}
+  .bemoji .emo{font-size:16px;line-height:1;}
+  /* summary strip */
+  .summary{padding:4px 16px 12px;}
+  .strip{display:flex;background:var(--card);border:1px solid var(--line);border-radius:14px;}
+  .scol{flex:1;min-width:0;text-align:center;padding:11px 6px;background:0;border:0;font-family:inherit;}
+  .scol .slbl{font-size:11px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .scol .sval{font-size:17px;font-weight:800;letter-spacing:-.3px;margin-top:2px;color:var(--txt);}
+  .sdiv{width:1px;background:var(--line);margin:9px 0;flex:0 0 auto;}
+  .scol.sbal{cursor:pointer;}
+  .scol.sbal .sval{color:var(--accent);}
   .sumcard{flex:1;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;}
   .sumcard .lbl{font-size:12px;color:var(--sub);margin-bottom:3px;}
   .sumcard .val{font-size:20px;font-weight:800;letter-spacing:-.4px;}
+  /* all-expenses meta: book truncates, date pinned */
+  .rall{display:flex;min-width:0;}
+  .rall .bkn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:0 1 auto;}
+  .rall .bkp{flex:0 0 auto;white-space:nowrap;}
+  .rall .bkd{flex:0 0 auto;white-space:nowrap;}
   /* list */
   .dayhdr{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;padding:14px 20px 6px;}
   .row{display:flex;align-items:center;gap:12px;padding:11px 14px;margin:0 12px 8px;
@@ -56,6 +69,7 @@
   .rmid{flex:1;min-width:0;}
   .rdesc{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .rmeta{font-size:12px;color:var(--sub);margin-top:1px;}
+  .solomark{font-weight:600;color:var(--txt);}
   .ramt{font-size:16px;font-weight:800;letter-spacing:-.3px;white-space:nowrap;}
   .pill{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;
     background:var(--accent-soft);color:var(--accent);margin-left:6px;vertical-align:1px;}
@@ -75,10 +89,16 @@
     padding:9px 14px;border-radius:22px;display:flex;align-items:center;gap:7px;cursor:pointer;}
   .datebtn svg{width:16px;height:16px;color:var(--sub);}
   .datebtn input[type=date]{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;margin:0;padding:0;cursor:pointer;-webkit-appearance:none;appearance:none;}
-  .amount-wrap{display:flex;align-items:center;justify-content:center;padding:12px 18px 4px;gap:3px;}
-  .amount-wrap .cur{font-size:26px;color:var(--muted);font-weight:700;}
-  .amount-input{border:0;background:transparent;outline:none;font-family:inherit;font-size:48px;font-weight:800;
-    letter-spacing:-1.5px;text-align:center;color:var(--txt);width:100%;max-width:260px;padding:0;}
+  .amount-wrap{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 4px;gap:10px;}
+  .amt-left{display:flex;align-items:center;gap:3px;min-width:0;flex:1;}
+  .amount-wrap .cur{font-size:26px;color:var(--muted);font-weight:700;flex:0 0 auto;}
+  .amount-input{border:0;background:transparent;outline:none;font-family:inherit;font-size:46px;font-weight:800;
+    letter-spacing:-1.5px;text-align:left;color:var(--txt);width:100%;min-width:0;flex:1;padding:0;}
+  .savefab{flex:0 0 auto;width:44px;height:44px;border-radius:50%;background:var(--accent);border:0;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 3px 10px #3f6ef255;}
+  .savefab svg{width:22px;height:22px;color:#fff;stroke-width:2.4;}
+  .savefab:disabled{background:var(--card2);box-shadow:none;}
+  .savefab:disabled svg{color:var(--muted);}
   .amount-input::placeholder{color:var(--muted);}
   .namewrap{display:flex;align-items:stretch;gap:8px;padding:0 16px 2px;}
   .typebtn{flex:0 0 auto;display:flex;align-items:center;gap:3px;background:var(--card);border:1px solid var(--line);
@@ -162,9 +182,18 @@
   .bookcard .bi{width:40px;height:40px;border-radius:11px;background:var(--card2);display:flex;align-items:center;justify-content:center;color:var(--txt);}
   .bookcard.on .bi{color:var(--accent);}
   .bookcard svg{width:20px;height:20px;}
-  .bookcard .bn{font-size:15px;font-weight:700;}
-  .bookcard .bm{font-size:12px;color:var(--sub);margin-top:1px;}
-  .bookcard .bt{font-size:15px;font-weight:800;white-space:nowrap;}
+  .bookcard .bn{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bookcard .bm{font-size:12px;color:var(--sub);margin-top:2px;display:flex;align-items:center;gap:5px;}
+  .bookcard .bkind{display:inline-flex;flex:0 0 auto;}
+  .bookcard .bkind svg{width:13px;height:13px;color:var(--sub);}
+  .bookcard .bchk{color:var(--green);font-weight:800;flex:0 0 auto;}
+  .bookcard .bchev{width:18px!important;height:18px!important;color:var(--muted);flex:0 0 auto;}
+  .bi .emo{font-size:20px;line-height:1;}
+  /* search book chip */
+  .bchip{display:inline-flex;align-items:center;gap:3px;background:var(--card2);border-radius:5px;padding:1px 6px;font-weight:600;color:var(--sub);vertical-align:1px;}
+  .bchip-i{display:inline-flex;}
+  .bchip-i svg{width:11px;height:11px;color:var(--sub);}
+  .bchip-i .emo{font-size:11px;}
   .addbook{width:calc(100% - 32px);margin:2px 16px;padding:15px;border-radius:var(--radius);border:1px dashed var(--muted);
     background:var(--card);color:var(--accent);font-size:15px;font-weight:700;}
   /* tabbar */
@@ -250,6 +279,9 @@
   .trend .tb.sel .stack{box-shadow:0 0 0 2px var(--accent);}
   .trend .tb.sel .tl{color:var(--accent);font-weight:800;}
   .trendcap{text-align:center;font-size:10.5px;color:var(--muted);margin-top:9px;}
+  .bbtoggle{display:flex;background:var(--card2);border-radius:9px;padding:2px;gap:2px;margin-top:12px;}
+  .bbtoggle button{flex:1;text-align:center;padding:6px 0;border-radius:7px;border:0;background:0;font-family:inherit;font-size:12px;font-weight:700;color:var(--sub);cursor:pointer;}
+  .bbtoggle button.on{background:var(--card);color:var(--txt);box-shadow:0 1px 2px rgba(0,0,0,.06);}
   .inslegend{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;padding:0 16px 12px;}
   .inslegend .lg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--sub);font-weight:600;}
   .inslegend .sw{width:10px;height:10px;border-radius:3px;flex:0 0 auto;}
@@ -306,7 +338,10 @@
 
   <!-- ============ CAPTURE (default) ============ -->
   <section id="view-add">
-    <div class="amount-wrap"><span class="cur">$</span><input id="amt-input" class="amount-input" inputmode="decimal" enterkeyhint="next" placeholder="0" autocomplete="off"></div>
+    <div class="amount-wrap">
+      <div class="amt-left"><span class="cur">$</span><input id="amt-input" class="amount-input" inputmode="decimal" enterkeyhint="next" placeholder="0" autocomplete="off"></div>
+      <button class="savefab" id="savebtn" onclick="save()" aria-label="Save"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11"/></svg></button>
+    </div>
 
     <div class="namewrap">
       <button class="typebtn" id="type-pill" onclick="toggleTypePanel()" aria-label="Type"></button>
@@ -334,7 +369,6 @@
       <div class="customrow hidden" id="custom-split"></div>
     </div>
 
-    <button class="savebtn" id="savebtn" onclick="save()"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11"/></svg><span id="save-label">Save expense</span></button>
   </section>
 
   <!-- ============ EXPENSES LIST ============ -->
@@ -430,7 +464,9 @@ const CATCOLOR={
  'Other':['#eeeee8','#deddd3','#6b6a63']};
 const BOOKICON={couple:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="16" cy="9" r="2.4"/><path d="M4 19c0-2.8 2.2-5 5-5s5 2.2 5 5M15 14c2.2 0 4 1.8 4 4"/></svg>',
  personal:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.5 3.1-6 7-6s7 2.5 7 6"/></svg>',
- work:'<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>'};
+ work:'<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+ trip:'<svg viewBox="0 0 24 24"><rect x="5" y="8" width="14" height="12" rx="2"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M9.5 12v4M14.5 12v4"/></svg>',
+ other:'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 4v8l3-2 3 2V4"/></svg>'};
 
 /* ---------- seed data ---------- */
 const COUPLE_ITEMS=[];
@@ -442,8 +478,9 @@ const DEFAULT_BOOKS=[
 const KEY='expenses_books_v3';
 
 let books, curId='couple', me='Thibaud', draft, view='add';
-let searchOpen=false, searchQuery='';
-let insPerson='Thibaud', insScopeV='month', insPeriod=new Date().toISOString().slice(0,7), insBooksSel='all', cdCat=null;
+let searchOpen=false, searchQuery='', allMode=false;
+function fmtDayShort(d){return new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});}
+let insPerson='Thibaud', insScopeV='month', insPeriod=new Date().toISOString().slice(0,7), insBooksSel='all', cdCat=null, insByBook=false;
 // book colors by KIND (family), with distinct shades within a family
 const BOOKFAM={
   couple:['#1f9d55','#15803d','#3cc27a','#0f5f34'],   // greens
@@ -489,38 +526,49 @@ function balanceText(b){
   if(Math.abs(net)<0.01)return'All settled up';
   return net>0?`${M[1]} owes ${M[0]} ${money(net)}`:`${M[0]} owes ${M[1]} ${money(-net)}`;
 }
-function bookIcon(b){return BOOKICON[b.id]||(b.type==='shared'?BOOKICON.couple:BOOKICON.personal);}
+function bookIcon(b){if(b&&b.emoji)return '<span class="emo">'+escapeHtml(b.emoji)+'</span>';const fam=bookFamily(b);return BOOKICON[fam]||BOOKICON.other;}
 
 /* ---------- appbar ---------- */
+const STACKICON='<svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg>';
 function renderAppbar(){
   const b=book();
-  document.getElementById('book-name').textContent=b.name;
-  document.getElementById('book-emoji').innerHTML=bookIcon(b);
+  const showAll=allMode&&view==='list';
+  document.getElementById('book-name').textContent=showAll?'All expenses':b.name;
+  document.getElementById('book-emoji').innerHTML=showAll?STACKICON:bookIcon(b);
   const w=document.getElementById('whoami');
-  if((view==='list'||view==='add')&&isShared()){w.classList.remove('hidden');document.getElementById('me-name').textContent=me;}
+  const showWho=(view==='add'&&isShared())||(view==='list'&&(allMode||isShared()));
+  if(showWho){w.classList.remove('hidden');document.getElementById('me-name').textContent=me;}
   else w.classList.add('hidden');
   document.getElementById('search-btn').classList.toggle('hidden',view!=='list');
-  document.getElementById('book-menu-btn').classList.toggle('hidden',view!=='list');
+  document.getElementById('book-menu-btn').classList.toggle('hidden',!(view==='list'&&!allMode));
   document.getElementById('appbar').classList.toggle('hidden',view==='books'||view==='insights'||view==='catdetail');
 }
 
+/* ---------- balance from the current user's perspective (directional) ---------- */
+function meNet(b){const {paid,owe,xfer}=computeBalance(b);return (paid[me]-owe[me])+(xfer[me]||0);}
+function balDirLabel(b){const n=meNet(b);if(Math.abs(n)<0.01)return'Settled';return n>0?`${otherMember(me)} owes you`:`You owe ${otherMember(me)}`;}
+function balDirValue(b){const n=meNet(b);return money(Math.abs(n)<0.01?0:Math.abs(n));}
+
 /* ---------- list ---------- */
 function renderList(){
+  if(allMode)return renderAllList();
   const b=book();
   let items=[...b.items].sort((a,z)=>a.date<z.date?1:a.date>z.date?-1:0);
   if(view==='list'&&searchQuery)items=items.filter(e=>matchExp(e,searchQuery));
   let grand=0,my=0;
   b.items.forEach(e=>{if(e.kind==='transfer')return;grand+=signedAmount(e);my+=shareOf(e,me);});
   const sum=document.getElementById('summary');
-  const bb=document.getElementById('balbar');
+  const bb=document.getElementById('balbar');bb.innerHTML='';bb.classList.add('hidden');
   if(isShared()){
-    sum.innerHTML=`<div class="sumcard"><div class="lbl">${me}'s share</div><div class="val">${money(my)}</div></div>
-      <div class="sumcard"><div class="lbl">Total expenses</div><div class="val">${money(grand)}</div></div>`;
-    bb.innerHTML=`<button class="balbtn" onclick="go('bal')"><span>${balanceText(b)}</span><span class="chev">›</span></button>`;
-    bb.classList.remove('hidden');
+    sum.innerHTML=`<div class="strip">
+      <div class="scol"><div class="slbl">Total</div><div class="sval">${money(grand)}</div></div>
+      <div class="sdiv"></div>
+      <div class="scol"><div class="slbl">${me}'s share</div><div class="sval">${money(my)}</div></div>
+      <div class="sdiv"></div>
+      <button class="scol sbal" onclick="go('bal')"><div class="slbl">${balDirLabel(b)}</div><div class="sval">${balDirValue(b)} ›</div></button>
+    </div>`;
   }else{
-    sum.innerHTML=`<div class="sumcard" style="flex:none;width:100%"><div class="lbl">Total — ${escapeHtml(b.name)}</div><div class="val">${money(grand)}</div></div>`;
-    bb.innerHTML='';bb.classList.add('hidden');
+    sum.innerHTML=`<div class="strip"><div class="scol"><div class="slbl">Total · ${escapeHtml(b.name)}</div><div class="sval">${money(grand)}</div></div></div>`;
   }
   const box=document.getElementById('list');
   if(!items.length){box.innerHTML=searchQuery?'<div class="empty">No matches for “'+escapeHtml(searchQuery)+'”.</div>':'<div class="empty">No expenses in this book yet.<br>Tap <b>Add</b> to log one.</div>';return;}
@@ -535,9 +583,10 @@ function renderList(){
       return;
     }
     const isInc=e.kind==='income';
-    const badge=isInc?`<span class="pill" style="background:#e3f4ea;color:var(--green)">credit</span>`
-      :((isShared()&&e.split==='mine')?`<span class="pill">${e.paidBy} only</span>`:'');
-    const meta=isShared()?`${isInc?'Received by':'Paid by'} ${e.paidBy} · ${e.cat}`:e.cat;
+    const badge=isInc?`<span class="pill" style="background:#e3f4ea;color:var(--green)">credit</span>`:'';
+    let meta;
+    if(!isShared())meta=escapeHtml(e.cat);
+    else meta=`${paidDescriptor(e,book().members)} · ${escapeHtml(e.cat)}`;
     const cc=CATCOLOR[e.cat]||CATCOLOR['Other'];
     const amtHtml=isInc?`<span style="color:var(--green)">+${money(e.amount)}</span>`:money(e.amount);
     html+=`<div class="row" onclick="openEditor('${e.id}')">
@@ -547,6 +596,48 @@ function renderList(){
   });
   box.innerHTML=html;
 }
+/* payer/beneficiary descriptor for a shared item (no category) — used by the list + all-expenses view */
+function paidDescriptor(e,M){
+  if(e.kind==='income')return `Received by ${e.paidBy}`;
+  if(e.split==='mine')return `<span class="solomark">${e.paidBy} only</span>`;
+  if(e.split==='custom'&&e.shares){
+    const other=(M[0]===e.paidBy)?M[1]:M[0];
+    const sp=e.shares[e.paidBy]||0, so=e.shares[other]||0;
+    if(Math.abs(sp-e.amount)<0.01&&Math.abs(so)<0.01)return `<span class="solomark">${e.paidBy} only</span>`;
+    if(Math.abs(so-e.amount)<0.01&&Math.abs(sp)<0.01)return `Paid by ${e.paidBy} · <span class="solomark">for ${other} only</span>`;
+  }
+  return `Paid by ${e.paidBy}`;
+}
+function renderAllList(){
+  let rows=[];
+  books.forEach(b=>b.items.forEach(e=>{if(!searchQuery||matchExp(e,searchQuery))rows.push({b,e});}));
+  rows.sort((x,z)=>x.e.date<z.e.date?1:x.e.date>z.e.date?-1:0);
+  let grand=0,my=0;
+  books.forEach(b=>{const inb=b.members.includes(me);b.items.forEach(e=>{if(e.kind==='transfer')return;grand+=signedAmount(e);if(inb)my+=shareOf(e,me);});});
+  document.getElementById('summary').innerHTML=`<div class="strip">
+    <div class="scol"><div class="slbl">Total · all books</div><div class="sval">${money(grand)}</div></div>
+    <div class="sdiv"></div>
+    <div class="scol"><div class="slbl">${me}'s share</div><div class="sval">${money(my)}</div></div></div>`;
+  const bb=document.getElementById('balbar');bb.innerHTML='';bb.classList.add('hidden');
+  const box=document.getElementById('list');
+  if(!rows.length){box.innerHTML=searchQuery?'<div class="empty">No matches for “'+escapeHtml(searchQuery)+'”.</div>':'<div class="empty">No expenses yet.</div>';return;}
+  let html='',cur=null;
+  rows.forEach(({b,e})=>{
+    if(e.date!==cur){cur=e.date;html+=`<div class="dayhdr">${fmtDay(e.date)}</div>`;}
+    const paidSeg=(b.type==='shared'&&e.kind!=='transfer')?`<span class="bkp"> · ${paidDescriptor(e,b.members)}</span>`:'';
+    const meta=`<div class="rmeta rall"><span class="bkn">${escapeHtml(b.name)}</span>${paidSeg}<span class="bkd"> · ${fmtDayShort(e.date)}</span></div>`;
+    if(e.kind==='transfer'){
+      html+=`<div class="row" onclick="openFromAll('${b.id}','${e.id}')"><div class="ico tr"><svg viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg></div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||'Transfer')}<span class="pill">transfer</span></div>${meta}</div><div class="ramt">${money(e.amount)}</div></div>`;
+      return;
+    }
+    const isInc=e.kind==='income';const cc=CATCOLOR[e.cat]||CATCOLOR['Other'];
+    const amtHtml=isInc?`<span style="color:var(--green)">+${money(e.amount)}</span>`:money(e.amount);
+    const badge=isInc?`<span class="pill" style="background:#e3f4ea;color:var(--green)">credit</span>`:'';
+    html+=`<div class="row" onclick="openFromAll('${b.id}','${e.id}')"><div class="ico" style="background:${cc[0]};color:${cc[2]}">${svg(e.cat)}</div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||e.cat)}${badge}</div>${meta}</div><div class="ramt">${amtHtml}</div></div>`;
+  });
+  box.innerHTML=html;
+}
+function openFromAll(bookId,id){curId=bookId;saveCur();openEditor(id);}
 /* ---------- editor ---------- */
 function openEditor(id){
   const b=book();const e=b.items.find(x=>x.id===id);if(!e)return;
@@ -758,7 +849,6 @@ function renderDraft(){
     if(splitPanelOpen&&showSplit&&draft.split==='custom'){cs.classList.remove('hidden');renderCustomRow();}
     else cs.classList.add('hidden');
   }else{cs.classList.add('hidden');panel.classList.add('hidden');}
-  document.getElementById('save-label').textContent=isTransfer?'Save transfer':(draft.kind==='income'?'Save income':'Save expense');
   document.getElementById('date-label').textContent=draft.isToday?'Today':fmtDay(draft.date);
   const di=document.getElementById('date-input');if(di)di.value=draft.date;
   renderCatGrid();
@@ -816,9 +906,13 @@ function save(){
 /* ---------- book picker ---------- */
 function openPicker(){
   let html='<div class="sheet"><h3>Switch book</h3>';
+  html+=`<div class="bookopt${allMode?' on':''}" onclick="chooseBook('__all__')">
+      <div class="bi">${STACKICON}</div>
+      <div style="flex:1"><div class="bn">All expenses</div><div class="bm">Every book, merged</div></div>
+    </div>`;
   books.forEach(b=>{
     const meta=b.type==='shared'?b.members.join(' + '):b.members[0]+' · personal';
-    html+=`<div class="bookopt${b.id===curId?' on':''}" onclick="chooseBook('${b.id}')">
+    html+=`<div class="bookopt${(!allMode&&b.id===curId)?' on':''}" onclick="chooseBook('${b.id}')">
       <div class="bi">${bookIcon(b)}</div>
       <div style="flex:1"><div class="bn">${escapeHtml(b.name)}</div><div class="bm">${escapeHtml(meta)} · ${b.items.length} expenses</div></div>
     </div>`;
@@ -830,7 +924,8 @@ function openPicker(){
 }
 function closePicker(){const p=document.getElementById('picker');if(p)p.remove();}
 function chooseBook(id){
-  curId=id;me=book().members[0];saveCur();closePicker();
+  if(id==='__all__'){allMode=true;closePicker();renderAll();return;}
+  allMode=false;curId=id;me=book().members[0];saveCur();closePicker();
   // keep the typed amount/name; only fix fields the new book invalidates
   if(!book().members.includes(draft.paidBy))draft.paidBy=me;
   if(draft.from&&!book().members.includes(draft.from)){draft.from=null;draft.to=null;}
@@ -854,23 +949,30 @@ function renderBooks(){
   if(fb)fb.classList.remove('hidden');
   let html='';
   books.forEach(b=>{
-    const total=b.items.reduce((s,e)=>e.kind==='transfer'?s:s+signedAmount(e),0);
-    const sub=b.type==='shared'?balanceText(b):b.members[0]+' · personal';
-    html+=`<div class="bookcard${b.id===curId?' on':''}" onclick="chooseBookGo('${b.id}')">
+    const upd=lastActivity(b);
+    const when=upd?('Updated '+fmtDay(upd)):'No expenses yet';
+    const kIco=b.emoji?`<span class="bkind">${kindIcon(b)}</span>`:'';
+    const chk=bookSettled(b)?'<span class="bchk">✓</span>':'';
+    html+=`<div class="bookcard${(!allMode&&b.id===curId)?' on':''}" onclick="chooseBookGo('${b.id}')">
       <div class="bi">${bookIcon(b)}</div>
-      <div style="flex:1;min-width:0"><div class="bn">${escapeHtml(b.name)}</div><div class="bm">${escapeHtml(sub)} · ${b.items.length} expenses</div></div>
-      <div class="bt">${money(total)}</div></div>`;
+      <div style="flex:1;min-width:0"><div class="bn">${escapeHtml(b.name)}</div><div class="bm">${kIco}${chk}<span>${when}</span></div></div>
+      <svg class="bchev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>`;
   });
   list.innerHTML=html+`<button class="addbook" onclick="openAddBook()">+ Add book</button>`;
   if(fb){fb.textContent=CLOUD?'Sign out':'Reset demo data';fb.onclick=CLOUD?cloudSignOut:resetDemo;}
 }
+function lastActivity(b){let m='';b.items.forEach(e=>{if(e.date>m)m=e.date;});return m||null;}
+function kindIcon(b){return BOOKICON[bookFamily(b)]||BOOKICON.other;}
+function bookSettled(b){return b.type==='shared'&&b.items.length>0&&Math.abs(computeBalance(b).net)<0.01;}
 function searchRow(b,e){
-  const badge=`<span class="bookbadge">${escapeHtml(b.name)}</span>`;
+  const chip=`<span class="bchip"><span class="bchip-i">${bookIcon(b)}</span>${escapeHtml(b.name)}</span>`;
+  const meta=`<div class="rmeta">${chip} · ${fmtDayShort(e.date)}</div>`;
   if(e.kind==='transfer'){
-    return `<div class="row" onclick="openFromSearch('${b.id}','${e.id}')"><div class="ico tr"><svg viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg></div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||'Transfer')}${badge}</div><div class="rmeta">${fmtDay(e.date)} · ${e.from} → ${e.to}</div></div><div class="ramt">${money(e.amount)}</div></div>`;
+    return `<div class="row" onclick="openFromSearch('${b.id}','${e.id}')"><div class="ico tr"><svg viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg></div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||'Transfer')}<span class="pill">transfer</span></div>${meta}</div><div class="ramt">${money(e.amount)}</div></div>`;
   }
-  const cc=CATCOLOR[e.cat]||CATCOLOR['Other'];
-  return `<div class="row" onclick="openFromSearch('${b.id}','${e.id}')"><div class="ico" style="background:${cc[0]};color:${cc[2]}">${svg(e.cat)}</div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||e.cat)}${badge}</div><div class="rmeta">${fmtDay(e.date)} · ${escapeHtml(e.cat)}</div></div><div class="ramt">${money(e.amount)}</div></div>`;
+  const cc=CATCOLOR[e.cat]||CATCOLOR['Other'];const isInc=e.kind==='income';
+  const amtHtml=isInc?`<span style="color:var(--green)">+${money(e.amount)}</span>`:money(e.amount);
+  return `<div class="row" onclick="openFromSearch('${b.id}','${e.id}')"><div class="ico" style="background:${cc[0]};color:${cc[2]}">${svg(e.cat)}</div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||e.cat)}</div>${meta}</div><div class="ramt">${amtHtml}</div></div>`;
 }
 function openFromSearch(bookId,id){curId=bookId;me=book().members[0];saveCur();renderAppbar();openEditor(id);}
 let nbOwner='shared';
@@ -878,6 +980,7 @@ function openAddBook(){
   nbOwner='shared';
   const html=`<div class="sheet"><h3>New book</h3>
     <div class="efield"><label>Name</label><input id="nb-name" placeholder="e.g. Trip 2027" autocomplete="off"></div>
+    <div class="efield"><label>Icon — emoji (optional)</label><input id="nb-emoji" maxlength="4" placeholder="😀 · blank = default icon" autocomplete="off" style="width:170px"></div>
     <div class="efield"><label>Who's it for?</label>
       <div class="seg" style="padding:0">
         <div class="opt on" id="nb-shared" onclick="nbSet('shared')">Both</div>
@@ -898,7 +1001,8 @@ function createBook(){
   const name=(document.getElementById('nb-name').value||'').trim();
   if(!name){alert('Give the book a name');return;}
   const shared=nbOwner==='shared';
-  const b={id:'b'+Date.now(),name:name,type:shared?'shared':'solo',members:shared?['Thibaud','Chun']:[nbOwner],items:[]};
+  const emoji=(document.getElementById('nb-emoji').value||'').trim()||null;
+  const b={id:'b'+Date.now(),name:name,type:shared?'shared':'solo',members:shared?['Thibaud','Chun']:[nbOwner],emoji:emoji,items:[]};
   books.push(b);persist();if(CLOUD)cloudInsertBook(b);curId=b.id;me=b.members[0];saveCur();closePicker();
   newDraft();renderDraft();go('list');toast('Book created');
 }
@@ -931,15 +1035,16 @@ function rerenderSearch(){if(view==='list')renderList();else if(view==='books')r
 function openBookMenu(){
   const b=book();
   const html=`<div class="sheet"><h3>${escapeHtml(b.name)}</h3>
-    <div class="menurow" onclick="openRenameBook()"><svg viewBox="0 0 24 24"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17z"/><path d="M13.5 7.5l3 3"/></svg>Rename book</div>
+    <div class="menurow" onclick="openRenameBook()"><svg viewBox="0 0 24 24"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17z"/><path d="M13.5 7.5l3 3"/></svg>Edit book</div>
     <button class="link" style="width:100%;padding:12px" onclick="closePicker()">Cancel</button></div>`;
   document.body.appendChild(mkSheet(html));
 }
 function openRenameBook(){
   closePicker();
   const b=book();
-  const html=`<div class="sheet"><h3>Rename book</h3>
+  const html=`<div class="sheet"><h3>Edit book</h3>
     <div class="efield"><label>Name</label><input id="rb-name" value="${escapeAttr(b.name)}" autocomplete="off"></div>
+    <div class="efield"><label>Icon — emoji (optional)</label><input id="rb-emoji" value="${escapeAttr(b.emoji||'')}" maxlength="4" placeholder="😀 · blank = default icon" autocomplete="off" style="width:170px"></div>
     <div class="ebtns"><button class="ebtn" onclick="closePicker()">Cancel</button>
       <button class="ebtn primary" onclick="saveRename()">Save</button></div></div>`;
   document.body.appendChild(mkSheet(html));
@@ -948,12 +1053,14 @@ function openRenameBook(){
 function saveRename(){
   const v=(document.getElementById('rb-name').value||'').trim();
   if(!v){alert('Give the book a name');return;}
-  const b=book();b.name=v;persist();if(CLOUD)cloudRenameBook(b.id,v);
-  closePicker();renderAll();toast('Renamed');
+  const em=(document.getElementById('rb-emoji').value||'').trim()||null;
+  const b=book();b.name=v;b.emoji=em;persist();if(CLOUD)cloudUpdateBookMeta(b.id,v,em);
+  closePicker();renderAll();toast('Saved');
 }
 
 /* ---------- insights ---------- */
-function personBooks(p){return books.filter(b=>b.members.includes(p));}
+function personBooks(p){if(p==='all')return books.slice();return books.filter(b=>b.members.includes(p));}
+function insShare(e){return insPerson==='all'?signedAmount(e):shareOf(e,insPerson);}  // 'All' = full amount (both members)
 function insSelectedBooks(){const pb=personBooks(insPerson);if(insBooksSel==='all')return pb;return pb.filter(b=>insBooksSel.includes(b.id));}
 function bookFamily(b){
   const id=b.id, n=(b.name||'').toLowerCase();
@@ -975,15 +1082,15 @@ function prevPeriod(scope,period){if(scope==='month'){let [y,m]=period.split('-'
 function stepPeriod(scope,period,dir){if(scope==='month'){let [y,m]=period.split('-').map(Number);m+=dir;while(m<1){m+=12;y--;}while(m>12){m-=12;y++;}return y+'-'+String(m).padStart(2,'0');}if(scope==='year')return String(Number(period)+dir);return period;}
 function fmtMonthFull(ym){const [y,m]=ym.split('-');return new Date(+y,+m-1,1).toLocaleDateString('en-US',{month:'long',year:'numeric'});}
 function fmtMonShort(ym){const [y,m]=ym.split('-');return new Date(+y,+m-1,1).toLocaleDateString('en-US',{month:'short'});}
-function insSum(pred){let tot=0;const byCat={};insSelectedBooks().forEach(b=>b.items.forEach(e=>{if(e.kind==='transfer')return;if(!pred(e))return;const s=shareOf(e,insPerson);if(!s)return;tot+=s;byCat[e.cat]=(byCat[e.cat]||0)+s;}));return {tot,byCat};}
-function monthsWithData(pred){const set=new Set();insSelectedBooks().forEach(b=>b.items.forEach(e=>{if(e.kind==='transfer')return;if(!pred(e))return;if(!shareOf(e,insPerson))return;set.add(e.date.slice(0,7));}));return set.size;}
+function insSum(pred){let tot=0;const byCat={};insSelectedBooks().forEach(b=>b.items.forEach(e=>{if(e.kind==='transfer')return;if(!pred(e))return;const s=insShare(e);if(!s)return;tot+=s;byCat[e.cat]=(byCat[e.cat]||0)+s;}));return {tot,byCat};}
+function monthsWithData(pred){const set=new Set();insSelectedBooks().forEach(b=>b.items.forEach(e=>{if(e.kind==='transfer')return;if(!pred(e))return;if(!insShare(e))return;set.add(e.date.slice(0,7));}));return set.size;}
 function trendRows(){
   const bks=insSelectedBooks();let periods=[];
   if(insScopeV==='month'){for(let i=5;i>=0;i--)periods.push(stepPeriod('month',insPeriod,-i));}
   else if(insScopeV==='year'){for(let m=1;m<=12;m++)periods.push(insPeriod+'-'+String(m).padStart(2,'0'));}
-  else{const ys=new Set();bks.forEach(b=>b.items.forEach(e=>{if(e.kind!=='transfer'&&shareOf(e,insPerson))ys.add(e.date.slice(0,4));}));periods=[...ys].sort();if(!periods.length)periods=[String(new Date().getFullYear())];}
+  else{const ys=new Set();bks.forEach(b=>b.items.forEach(e=>{if(e.kind!=='transfer'&&insShare(e))ys.add(e.date.slice(0,4));}));periods=[...ys].sort();if(!periods.length)periods=[String(new Date().getFullYear())];}
   const keyLen=(insScopeV==='all')?4:7;
-  return periods.map(p=>{const per={};let t=0;bks.forEach(b=>{let s=0;b.items.forEach(e=>{if(e.kind==='transfer')return;if(e.date.slice(0,keyLen)!==p)return;s+=shareOf(e,insPerson);});if(s>0){per[b.id]=s;t+=s;}});return {period:p,per,total:t};});
+  return periods.map(p=>{const per={};let t=0;bks.forEach(b=>{let s=0;b.items.forEach(e=>{if(e.kind==='transfer')return;if(e.date.slice(0,keyLen)!==p)return;s+=insShare(e);});if(s>0){per[b.id]=s;t+=s;}});return {period:p,per,total:t};});
 }
 function insBarTap(period){if(insScopeV==='month')insPeriod=period;else if(insScopeV==='year'){insScopeV='month';insPeriod=period;}else{insScopeV='year';insPeriod=period;}renderInsights();}
 function insStep(dir){insPeriod=stepPeriod(insScopeV,insPeriod,dir);renderInsights();}
@@ -995,12 +1102,15 @@ function setInsScope(s){
   insScopeV=s;renderInsights();
 }
 function openInsPerson(){
-  const html=`<div class="sheet"><h3>Whose spending</h3>`+
-    ['Thibaud','Chun'].map(p=>`<div class="bookopt${p===insPerson?' on':''}" onclick="pickInsPerson('${p}')"><div class="bi"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.5 3.1-6 7-6s7 2.5 7 6"/></svg></div><div style="flex:1"><div class="bn">${p}</div></div></div>`).join('')
+  const person='<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.5 3.1-6 7-6s7 2.5 7 6"/></svg>';
+  const both='<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="16" cy="9" r="2.4"/><path d="M4 19c0-2.8 2.2-5 5-5s5 2.2 5 5M15 14c2.2 0 4 1.8 4 4"/></svg>';
+  const opt=(p,label,icon)=>`<div class="bookopt${p===insPerson?' on':''}" onclick="pickInsPerson('${p}')"><div class="bi">${icon}</div><div style="flex:1"><div class="bn">${label}</div></div></div>`;
+  const html=`<div class="sheet"><h3>Whose spending</h3>`+opt('Thibaud','Thibaud',person)+opt('Chun','Chun',person)+opt('all','All',both)
     +`<button class="link" style="width:100%;padding:12px" onclick="closePicker()">Cancel</button></div>`;
   document.body.appendChild(mkSheet(html));
 }
 function pickInsPerson(p){insPerson=p;insBooksSel='all';closePicker();renderInsights();}
+function setInsByBook(v){insByBook=v;renderInsights();}
 function openInsBooks(){
   const pb=personBooks(insPerson);
   let html=`<div class="sheet"><h3>Which books</h3>`;
@@ -1022,7 +1132,7 @@ function insBooksToggle(id){
 }
 function insBooksRefresh(){closePicker();openInsBooks();renderInsights();}
 function renderInsights(){
-  document.getElementById('ins-person-lab').textContent=insPerson;
+  document.getElementById('ins-person-lab').textContent=insPerson==='all'?'All':insPerson;
   const pb=personBooks(insPerson);
   let blabel;
   if(insBooksSel==='all')blabel='All books';
@@ -1040,17 +1150,21 @@ function renderInsights(){
   const bars=rows.map(r=>{
     const sel=(insScopeV==='month'&&r.period===insPeriod);
     const h=Math.max(Math.round(Math.max(r.total,0)/maxT*60),r.total>0?4:2);
-    const posSum=selBooks.reduce((s,b)=>s+Math.max(r.per[b.id]||0,0),0)||1; // net-negative periods: stack positive spend only
-    let segs='';selBooks.forEach(b=>{const v=r.per[b.id]||0;if(v<=0)return;const pct=Math.round(v/posSum*100);segs+=`<span class="seg" style="height:${pct}%;background:${insBookColor(b.id)}"></span>`;});
+    let segs;
+    if(insByBook){
+      const posSum=selBooks.reduce((s,b)=>s+Math.max(r.per[b.id]||0,0),0)||1; // net-negative periods: stack positive spend only
+      segs='';selBooks.forEach(b=>{const v=r.per[b.id]||0;if(v<=0)return;const pct=Math.round(v/posSum*100);segs+=`<span class="seg" style="height:${pct}%;background:${insBookColor(b.id)}"></span>`;});
+    }else segs=`<span class="seg" style="height:100%;background:${sel?'var(--accent)':'#c9d8fb'}"></span>`;
     const lab=(insScopeV==='all')?r.period:fmtMonShort(r.period);
     return `<div class="tb${sel?' sel':''}" onclick="insBarTap('${r.period}')"><div class="stack" style="height:${h}px">${segs}</div><span class="tl">${lab}</span></div>`;
   }).join('');
   const cap=insScopeV==='month'?'tap a bar to change month':insScopeV==='year'?'tap a month to drill in':'tap a year to drill in';
   const legend=selBooks.map(b=>`<span class="lg"><span class="sw" style="background:${insBookColor(b.id)}"></span>${escapeHtml(b.name)}</span>`).join('');
-  const cats=Object.keys(byCat).sort((a,z)=>byCat[z]-byCat[a]);const maxC=Math.max(...cats.map(c=>Math.max(byCat[c],0)),1);
+  const cats=Object.keys(byCat).sort((a,z)=>byCat[z]-byCat[a]);
+  const pdisp=insPerson==='all'?'everyone':insPerson;
   let catHtml;
-  if(!cats.length)catHtml=`<div class="ins-empty">No spending for ${escapeHtml(insPerson)} in ${escapeHtml(plabel)}.</div>`;
-  else catHtml=cats.map(c=>{const cc=CATCOLOR[c]||CATCOLOR['Other'];const w=Math.max(0,Math.round(byCat[c]/maxC*100));const avg=showAvg?`<span class="cavg">${money(byCat[c]/nMonths)}/mo</span>`:'';return `<div class="catrow" onclick="openCatDetail('${escapeAttr(c)}')"><span class="cico" style="background:${cc[0]};color:${cc[2]}">${svg(c)}</span><div class="cmid"><div class="ctop"><span>${escapeHtml(c)}</span><span class="cright"><span class="camt">${money(byCat[c])}</span>${avg}</span></div><div class="cbar" style="width:${w}%;background:${cc[2]}"></div></div><span class="cchev">›</span></div>`;}).join('');
+  if(!cats.length)catHtml=`<div class="ins-empty">No spending for ${escapeHtml(pdisp)} in ${escapeHtml(plabel)}.</div>`;
+  else catHtml=cats.map(c=>{const cc=CATCOLOR[c]||CATCOLOR['Other'];const avg=showAvg?`<span class="cavg">${money(byCat[c]/nMonths)}/mo</span>`:'';return `<div class="catrow" onclick="openCatDetail('${escapeAttr(c)}')"><span class="cico" style="background:${cc[0]};color:${cc[2]}">${svg(c)}</span><div class="cmid"><div class="ctop"><span>${escapeHtml(c)}</span><span class="cright"><span class="camt">${money(byCat[c])}</span>${avg}</span></div></div><span class="cchev">›</span></div>`;}).join('');
   const dis=insScopeV==='all'?'disabled':'';
   body.innerHTML=`<div class="inscard">
       <div class="insstep"><button class="nav" ${dis} onclick="insStep(-1)">‹</button><span class="plabel">${escapeHtml(plabel)}</span><button class="nav" ${dis} onclick="insStep(1)">›</button></div>
@@ -1058,19 +1172,21 @@ function renderInsights(){
       ${showAvg?`<div class="insavg">avg ${money(tot/nMonths)}/mo · ${nMonths} month${nMonths>1?'s':''} with data</div>`:''}
       <div class="trend">${bars}</div>
       <div class="trendcap">${cap}</div>
+      <div class="bbtoggle"><button class="${!insByBook?'on':''}" onclick="setInsByBook(false)">Total</button><button class="${insByBook?'on':''}" onclick="setInsByBook(true)">By book</button></div>
     </div>
-    ${legend?`<div class="inslegend">${legend}</div>`:''}
+    ${(insByBook&&legend)?`<div class="inslegend">${legend}</div>`:''}
     <div class="inslabel">By category</div>${catHtml}`;
 }
 function openCatDetail(cat){cdCat=cat;go('catdetail');}
 function renderCatDetail(){
   document.getElementById('cd-title').textContent=cdCat;
   const pred=periodPred(insScopeV,insPeriod);const rows=[];
-  insSelectedBooks().forEach(b=>b.items.forEach(e=>{if(e.kind==='transfer'||e.cat!==cdCat||!pred(e))return;const s=shareOf(e,insPerson);if(!s)return;rows.push({b,e,s});}));
+  insSelectedBooks().forEach(b=>b.items.forEach(e=>{if(e.kind==='transfer'||e.cat!==cdCat||!pred(e))return;const s=insShare(e);if(!s)return;rows.push({b,e,s});}));
   rows.sort((x,z)=>x.e.date<z.e.date?1:x.e.date>z.e.date?-1:0);
   const tot=rows.reduce((a,r)=>a+r.s,0);
   const scopeLbl=insScopeV==='month'?fmtMonthFull(insPeriod):insScopeV==='year'?insPeriod:'all time';
-  let html=`<div class="summary"><div class="sumcard" style="flex:none;width:100%"><div class="lbl">${escapeHtml(insPerson)}'s ${escapeHtml(cdCat)} · ${escapeHtml(scopeLbl)}</div><div class="val">${money(tot)}</div></div></div>`;
+  const who=insPerson==='all'?'Everyone':insPerson+"'s";
+  let html=`<div class="summary"><div class="sumcard" style="flex:none;width:100%"><div class="lbl">${escapeHtml(who)} ${escapeHtml(cdCat)} · ${escapeHtml(scopeLbl)}</div><div class="val">${money(tot)}</div></div></div>`;
   if(!rows.length){document.getElementById('cd-body').innerHTML=html+'<div class="empty">Nothing here.</div>';return;}
   let cur=null;
   rows.forEach(({b,e,s})=>{
@@ -1124,8 +1240,8 @@ function fromRow(r){if(r.kind==='transfer')return {id:r.id,kind:'transfer',date:
 async function cloudInsertExpense(item,bookId){const {error}=await supa.from('expenses').insert(toRow(item,bookId));if(error)cloudWarn(error);}
 async function cloudUpsertExpense(item,bookId){const {error}=await supa.from('expenses').update(toRow(item,bookId||curId)).eq('id',item.id);if(error)cloudWarn(error);}
 async function cloudDeleteExpense(id){const {error}=await supa.from('expenses').delete().eq('id',id);if(error)cloudWarn(error);}
-async function cloudInsertBook(b){const {error}=await supa.from('books').insert({id:b.id,name:b.name,type:b.type,members:b.members,sort:Date.now()});if(error)cloudWarn(error);}
-async function cloudRenameBook(id,name){const {error}=await supa.from('books').update({name}).eq('id',id);if(error)cloudWarn(error);}
+async function cloudInsertBook(b){const {error}=await supa.from('books').insert({id:b.id,name:b.name,type:b.type,members:b.members,emoji:b.emoji||null,sort:Date.now()});if(error)cloudWarn(error);}
+async function cloudUpdateBookMeta(id,name,emoji){const {error}=await supa.from('books').update({name,emoji:emoji||null}).eq('id',id);if(error)cloudWarn(error);}
 function cloudWarn(error){console.error(error);toast('Sync error — check connection');}
 async function cloudSignOut(){try{await supa.auth.signOut();}catch(e){}location.reload();}
 async function cloudFetch(){
@@ -1135,7 +1251,7 @@ async function cloudFetch(){
   ]);
   if(r1.error||r2.error){console.error(r1.error||r2.error);try{const s=localStorage.getItem(KEY);if(s)books=JSON.parse(s);}catch(_){}if(!books)books=JSON.parse(JSON.stringify(DEFAULT_BOOKS));return;}
   const map={};
-  books=(r1.data||[]).map(b=>{const bk={id:b.id,name:b.name,type:b.type,members:b.members,items:[]};map[b.id]=bk;return bk;});
+  books=(r1.data||[]).map(b=>{const bk={id:b.id,name:b.name,type:b.type,members:b.members,emoji:b.emoji||null,items:[]};map[b.id]=bk;return bk;});
   (r2.data||[]).forEach(r=>{const bk=map[r.book_id];if(!bk)return;bk.items.push(fromRow(r));});
   if(!books.length)books=JSON.parse(JSON.stringify(DEFAULT_BOOKS));
   try{localStorage.setItem(KEY,JSON.stringify(books));}catch(_){}
