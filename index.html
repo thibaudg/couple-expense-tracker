@@ -248,6 +248,22 @@
   .menurow{display:flex;align-items:center;gap:11px;padding:14px;background:var(--card);border:1px solid var(--line);
     border-radius:var(--radius);margin-bottom:8px;font-size:15px;font-weight:600;color:var(--txt);cursor:pointer;}
   .menurow svg{width:19px;height:19px;color:var(--accent);}
+  .menurow.danger{color:#c0392b;}
+  .menurow.danger svg{color:#c0392b;}
+  /* read-only banner + info sheet */
+  .rolock{margin:6px 16px 2px;padding:10px 12px;background:#fdf6e9;border:1px solid #f0dfae;border-radius:12px;font-size:12.5px;color:#7a5b12;line-height:1.4;}
+  .roinfo{padding:0 16px;}
+  .rorow{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;}
+  .rorow span{color:var(--sub);}
+  /* account sheet */
+  .idsub{font-size:12.5px;color:var(--sub);padding:0 8px 10px;line-height:1.4;}
+  .acctcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:0 4px 10px;}
+  .acctname{font-size:17px;font-weight:800;display:flex;align-items:center;gap:8px;}
+  .acctname .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);}
+  .acctmail{font-size:13px;color:var(--sub);margin-top:3px;}
+  /* books-page section headers + owner lock */
+  .bsec{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;padding:10px 4px 6px;}
+  .bookcard .block{width:16px!important;height:16px!important;color:var(--muted);flex:0 0 auto;margin-right:2px;}
   /* insights */
   .ins-head{display:flex;gap:8px;padding:4px 16px 10px;}
   .inschip{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--card);
@@ -327,7 +343,7 @@
     <div class="appbar-right">
       <button class="iconbtn hidden" id="search-btn" onclick="toggleSearch()" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.4-3.4"/></svg></button>
       <button class="iconbtn hidden" id="book-menu-btn" onclick="openBookMenu()" aria-label="Book options"><svg viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg></button>
-      <button class="whoami hidden" id="whoami" onclick="toggleMe()"><span class="dot"></span><span id="me-name">Thibaud</span></button>
+      <button class="whoami hidden" id="whoami" onclick="openAccount()"><span class="dot"></span><span id="me-name">Thibaud</span></button>
     </div>
   </header>
 
@@ -338,6 +354,7 @@
 
   <!-- ============ CAPTURE (default) ============ -->
   <section id="view-add">
+    <div class="rolock hidden" id="add-lock"></div>
     <div class="amount-wrap">
       <div class="amt-left"><span class="cur">$</span><input id="amt-input" class="amount-input" inputmode="decimal" enterkeyhint="next" placeholder="0" autocomplete="off"></div>
       <button class="savefab" id="savebtn" onclick="save()" aria-label="Save"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11"/></svg></button>
@@ -478,7 +495,10 @@ const DEFAULT_BOOKS=[
 const KEY='expenses_books_v3';
 
 let books, curId='couple', me='Thibaud', draft, view='add';
-let searchOpen=false, searchQuery='', allMode=false;
+let searchOpen=false, searchQuery='', allMode=false, authEmail=null;
+const PEOPLE=['Thibaud','Chun'];
+function otherPerson(){return me===PEOPLE[0]?PEOPLE[1]:PEOPLE[0];}
+function canEdit(b){return !!b&&(b.type==='shared'||b.members[0]===me);}   // shared or your own solo book
 function fmtDayShort(d){return new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});}
 let insPerson='Thibaud', insScopeV='month', insPeriod=new Date().toISOString().slice(0,7), insBooksSel='all', cdCat=null, insByBook=false;
 // book colors by KIND (family), with distinct shades within a family
@@ -536,11 +556,11 @@ function renderAppbar(){
   document.getElementById('book-name').textContent=showAll?'All expenses':b.name;
   document.getElementById('book-emoji').innerHTML=showAll?STACKICON:bookIcon(b);
   const w=document.getElementById('whoami');
-  const showWho=(view==='add'&&isShared())||(view==='list'&&(allMode||isShared()));
+  const showWho=(view==='list'||view==='add');   // now the account chip (your name)
   if(showWho){w.classList.remove('hidden');document.getElementById('me-name').textContent=me;}
   else w.classList.add('hidden');
   document.getElementById('search-btn').classList.toggle('hidden',view!=='list');
-  document.getElementById('book-menu-btn').classList.toggle('hidden',!(view==='list'&&!allMode));
+  document.getElementById('book-menu-btn').classList.toggle('hidden',!(view==='list'&&!allMode&&canEdit(b)));
   document.getElementById('appbar').classList.toggle('hidden',view==='books'||view==='insights'||view==='catdetail');
 }
 
@@ -641,10 +661,11 @@ function openFromAll(bookId,id){curId=bookId;saveCur();openEditor(id);}
 /* ---------- editor ---------- */
 function openEditor(id){
   const b=book();const e=b.items.find(x=>x.id===id);if(!e)return;
+  if(!canEdit(b))return openReadOnly(b,e);            // other person's personal book → view only
   const isTr=e.kind==='transfer';
   const M=['Thibaud','Chun']; // shared-book members (couple books are always these two)
   const catOpts=CATS.map(c=>`<option ${c===e.cat?'selected':''}>${escapeHtml(c)}</option>`).join('');
-  const bookOpts=books.map(bk=>`<option value="${bk.id}" ${bk.id===curId?'selected':''}>${escapeHtml(bk.id==='couple'?'Couple — Shared Living':bk.name)}</option>`).join('');
+  const bookOpts=books.filter(bk=>canEdit(bk)).map(bk=>`<option value="${bk.id}" ${bk.id===curId?'selected':''}>${escapeHtml(bk.name)}</option>`).join('');
   const from=e.from||M[0];
   const dirOpts=[[M[0],M[1]],[M[1],M[0]]].map(([f,t])=>`<option value="${f}" ${from===f?'selected':''}>${f} → ${t}</option>`).join('');
   const paidGuess=(e.paidBy&&M.includes(e.paidBy))?e.paidBy:M[0];
@@ -677,6 +698,19 @@ function openEditor(id){
   bg.onclick=ev=>{if(ev.target===bg)closePicker();};
   document.body.appendChild(bg);
   editorSync();
+}
+function openReadOnly(b,e){
+  const isTr=e.kind==='transfer';const rows=[];
+  rows.push(['Amount',(e.kind==='income'?'+':'')+money(e.amount)]);
+  rows.push(['Date',fmtDay(e.date)]);
+  if(isTr)rows.push(['Transfer',e.from+' → '+e.to]);
+  else{rows.push(['Category',e.cat]);if(b.type==='shared')rows.push([e.kind==='income'?'Received by':'Paid by',e.paidBy]);}
+  const body=rows.map(([k,v])=>`<div class="rorow"><span>${k}</span><b>${escapeHtml(String(v))}</b></div>`).join('');
+  const html=`<div class="sheet"><h3>${escapeHtml(e.desc||e.cat||'Expense')}</h3>
+    <div class="rolock" style="margin:0 16px 8px">🔒 Read-only — this is <b>${escapeHtml(b.members[0])}'s</b> personal book.</div>
+    <div class="roinfo">${body}</div>
+    <button class="link" style="width:100%;padding:12px" onclick="closePicker()">Close</button></div>`;
+  document.body.appendChild(mkSheet(html));
 }
 function editorSync(){
   const bk=books.find(x=>x.id===document.getElementById('e-book').value);
@@ -776,7 +810,7 @@ function newDraft(){
 }
 function otherMember(m){const M=book().members;return M[0]===m?M[1]:M[0];}
 function amountVal(){const ai=document.getElementById('amt-input');return ai?parseFloat(ai.value):NaN;}
-function updateSaveState(){document.getElementById('savebtn').disabled=!(amountVal()>0);}
+function updateSaveState(){document.getElementById('savebtn').disabled=!(amountVal()>0&&canEdit(book()));}
 function focusAmount(){const ai=document.getElementById('amt-input');if(ai)ai.focus();}
 function renderCatGrid(){
   document.getElementById('catgrid').innerHTML=CATS.map(n=>{
@@ -827,6 +861,10 @@ function pickSplit(v){
   renderDraft();
 }
 function renderDraft(){
+  const b0=book();const ro=!canEdit(b0);
+  const lock=document.getElementById('add-lock');
+  if(ro){const fam=bookFamily(b0);lock.classList.remove('hidden');lock.innerHTML='🔒 Read-only — <b>'+escapeHtml(b0.members[0])+"'s "+(fam==='work'?'work':fam==='trip'?'trip':'personal')+' book</b>. Switch books to add here.';}
+  else lock.classList.add('hidden');
   const shared=isShared();
   const isTransfer=shared&&draft.kind==='transfer';
   const showSplit=shared&&!isTransfer;
@@ -882,6 +920,7 @@ function onDateChange(){
 }
 function save(){
   const n=amountVal();if(!(n>0))return;
+  if(!canEdit(book()))return;
   const nm=(document.getElementById('name-input').value||'').trim();
   const b=book();
   const amt=Math.round(n*100)/100;
@@ -925,9 +964,9 @@ function openPicker(){
 function closePicker(){const p=document.getElementById('picker');if(p)p.remove();}
 function chooseBook(id){
   if(id==='__all__'){allMode=true;closePicker();renderAll();return;}
-  allMode=false;curId=id;me=book().members[0];saveCur();closePicker();
-  // keep the typed amount/name; only fix fields the new book invalidates
-  if(!book().members.includes(draft.paidBy))draft.paidBy=me;
+  allMode=false;curId=id;saveCur();closePicker();
+  // keep the typed amount/name; only fix fields the new book invalidates (me stays = your login identity)
+  if(!book().members.includes(draft.paidBy))draft.paidBy=book().members.includes(me)?me:book().members[0];
   if(draft.from&&!book().members.includes(draft.from)){draft.from=null;draft.to=null;}
   if(!isShared())draft.kind='expense';
   renderAll();renderDraft();updateSaveState();
@@ -947,19 +986,26 @@ function renderBooks(){
     return;
   }
   if(fb)fb.classList.remove('hidden');
+  const shared=books.filter(b=>b.type==='shared');
+  const mine=books.filter(b=>b.type==='solo'&&b.members[0]===me);
+  const theirs=books.filter(b=>b.type==='solo'&&b.members[0]!==me);
   let html='';
-  books.forEach(b=>{
-    const upd=lastActivity(b);
-    const when=upd?('Updated '+fmtDay(upd)):'No expenses yet';
-    const kIco=b.emoji?`<span class="bkind">${kindIcon(b)}</span>`:'';
-    const chk=bookSettled(b)?'<span class="bchk">✓</span>':'';
-    html+=`<div class="bookcard${(!allMode&&b.id===curId)?' on':''}" onclick="chooseBookGo('${b.id}')">
-      <div class="bi">${bookIcon(b)}</div>
-      <div style="flex:1;min-width:0"><div class="bn">${escapeHtml(b.name)}</div><div class="bm">${kIco}${chk}<span>${when}</span></div></div>
-      <svg class="bchev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>`;
-  });
+  if(shared.length)html+=`<div class="bsec">Shared</div>`+shared.map(bookCardHtml).join('');
+  if(mine.length)html+=`<div class="bsec">Yours</div>`+mine.map(bookCardHtml).join('');
+  if(theirs.length)html+=`<div class="bsec">${escapeHtml(otherPerson())}'s</div>`+theirs.map(bookCardHtml).join('');
   list.innerHTML=html+`<button class="addbook" onclick="openAddBook()">+ Add book</button>`;
-  if(fb){fb.textContent=CLOUD?'Sign out':'Reset demo data';fb.onclick=CLOUD?cloudSignOut:resetDemo;}
+  if(fb){if(CLOUD)fb.classList.add('hidden');else{fb.classList.remove('hidden');fb.textContent='Reset demo data';fb.onclick=resetDemo;}}
+}
+function bookCardHtml(b){
+  const upd=lastActivity(b);
+  const when=upd?('Updated '+fmtDay(upd)):'No expenses yet';
+  const kIco=b.emoji?`<span class="bkind">${kindIcon(b)}</span>`:'';
+  const chk=bookSettled(b)?'<span class="bchk">✓</span>':'';
+  const lock=!canEdit(b)?'<svg class="block" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>':'';
+  return `<div class="bookcard${(!allMode&&b.id===curId)?' on':''}" onclick="chooseBookGo('${b.id}')">
+    <div class="bi">${bookIcon(b)}</div>
+    <div style="flex:1;min-width:0"><div class="bn">${escapeHtml(b.name)}</div><div class="bm">${kIco}${chk}<span>${when}</span></div></div>
+    ${lock}<svg class="bchev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>`;
 }
 function lastActivity(b){let m='';b.items.forEach(e=>{if(e.date>m)m=e.date;});return m||null;}
 function kindIcon(b){return BOOKICON[bookFamily(b)]||BOOKICON.other;}
@@ -974,36 +1020,41 @@ function searchRow(b,e){
   const amtHtml=isInc?`<span style="color:var(--green)">+${money(e.amount)}</span>`:money(e.amount);
   return `<div class="row" onclick="openFromSearch('${b.id}','${e.id}')"><div class="ico" style="background:${cc[0]};color:${cc[2]}">${svg(e.cat)}</div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||e.cat)}</div>${meta}</div><div class="ramt">${amtHtml}</div></div>`;
 }
-function openFromSearch(bookId,id){curId=bookId;me=book().members[0];saveCur();renderAppbar();openEditor(id);}
-let nbOwner='shared';
+function openFromSearch(bookId,id){curId=bookId;saveCur();renderAppbar();openEditor(id);}
+let nbShared=true, nbKind='couple', rbKind='couple';
+function kindOpt(k,l){return `<div class="opt${nbKind===k?' on':''}" data-k="${k}" onclick="nbSetKind('${k}')">${l}</div>`;}
 function openAddBook(){
-  nbOwner='shared';
+  nbShared=true;nbKind='couple';
   const html=`<div class="sheet"><h3>New book</h3>
-    <div class="efield"><label>Name</label><input id="nb-name" placeholder="e.g. Trip 2027" autocomplete="off"></div>
+    <div class="efield"><label>Name</label><input id="nb-name" placeholder="e.g. Japan 2027" autocomplete="off"></div>
     <div class="efield"><label>Icon — emoji (optional)</label><input id="nb-emoji" maxlength="4" placeholder="😀 · blank = default icon" autocomplete="off" style="width:170px"></div>
     <div class="efield"><label>Who's it for?</label>
-      <div class="seg" style="padding:0">
-        <div class="opt on" id="nb-shared" onclick="nbSet('shared')">Both</div>
-        <div class="opt" id="nb-Thibaud" onclick="nbSet('Thibaud')">Thibaud</div>
-        <div class="opt" id="nb-Chun" onclick="nbSet('Chun')">Chun</div>
+      <div class="seg" id="nb-owner" style="padding:0">
+        <div class="opt on" data-o="shared" onclick="nbSetOwner('shared')">Shared (both)</div>
+        <div class="opt" data-o="me" onclick="nbSetOwner('me')">Just ${escapeHtml(me)}</div>
+      </div></div>
+    <div class="efield"><label>Type (icon)</label>
+      <div class="seg" id="nb-type" style="padding:0;flex-wrap:wrap;gap:6px">
+        ${kindOpt('couple','Couple')}${kindOpt('personal','Personal')}${kindOpt('work','Work')}${kindOpt('trip','Trip')}
       </div></div>
     <div class="ebtns"><button class="ebtn" onclick="closePicker()">Cancel</button>
       <button class="ebtn primary" onclick="createBook()">Create book</button></div></div>`;
-  const bg=document.createElement('div');bg.className='sheet-bg';bg.id='picker';bg.innerHTML=html;
-  bg.onclick=ev=>{if(ev.target===bg)closePicker();};
-  document.body.appendChild(bg);
+  document.body.appendChild(mkSheet(html));
   setTimeout(()=>{const el=document.getElementById('nb-name');if(el)el.focus();},50);
 }
-function nbSet(v){nbOwner=v;
-  ['shared','Thibaud','Chun'].forEach(k=>document.getElementById('nb-'+k).classList.toggle('on',k===v));
+function nbSetOwner(v){nbShared=(v==='shared');
+  document.querySelectorAll('#nb-owner .opt').forEach(o=>o.classList.toggle('on',o.dataset.o===v));
+  if(nbShared&&(nbKind==='personal'||nbKind==='work'))nbSetKind('couple');
+  if(!nbShared&&nbKind==='couple')nbSetKind('personal');
 }
+function nbSetKind(k){nbKind=k;document.querySelectorAll('#nb-type .opt').forEach(o=>o.classList.toggle('on',o.dataset.k===k));}
 function createBook(){
   const name=(document.getElementById('nb-name').value||'').trim();
   if(!name){alert('Give the book a name');return;}
-  const shared=nbOwner==='shared';
   const emoji=(document.getElementById('nb-emoji').value||'').trim()||null;
-  const b={id:'b'+Date.now(),name:name,type:shared?'shared':'solo',members:shared?['Thibaud','Chun']:[nbOwner],emoji:emoji,items:[]};
-  books.push(b);persist();if(CLOUD)cloudInsertBook(b);curId=b.id;me=b.members[0];saveCur();closePicker();
+  const members=nbShared?PEOPLE.slice():[me];
+  const b={id:'b'+Date.now(),name:name,type:nbShared?'shared':'solo',members:members,emoji:emoji,kind:nbKind,items:[]};
+  books.push(b);persist();if(CLOUD)cloudInsertBook(b);curId=b.id;allMode=false;saveCur();closePicker();
   newDraft();renderDraft();go('list');toast('Book created');
 }
 
@@ -1041,21 +1092,47 @@ function openBookMenu(){
 }
 function openRenameBook(){
   closePicker();
-  const b=book();
+  const b=book();rbKind=b.kind||bookFamily(b);
+  const kinds=b.type==='shared'?[['couple','Couple'],['trip','Trip']]:[['personal','Personal'],['work','Work'],['trip','Trip']];
+  const seg=kinds.map(([k,l])=>`<div class="opt${rbKind===k?' on':''}" data-k="${k}" onclick="rbSetKind('${k}')">${l}</div>`).join('');
   const html=`<div class="sheet"><h3>Edit book</h3>
     <div class="efield"><label>Name</label><input id="rb-name" value="${escapeAttr(b.name)}" autocomplete="off"></div>
     <div class="efield"><label>Icon — emoji (optional)</label><input id="rb-emoji" value="${escapeAttr(b.emoji||'')}" maxlength="4" placeholder="😀 · blank = default icon" autocomplete="off" style="width:170px"></div>
+    <div class="efield"><label>Type (icon)</label><div class="seg" id="rb-type" style="padding:0;flex-wrap:wrap;gap:6px">${seg}</div></div>
     <div class="ebtns"><button class="ebtn" onclick="closePicker()">Cancel</button>
       <button class="ebtn primary" onclick="saveRename()">Save</button></div></div>`;
   document.body.appendChild(mkSheet(html));
   setTimeout(()=>{const el=document.getElementById('rb-name');if(el){el.focus();el.select();}},50);
 }
+function rbSetKind(k){rbKind=k;document.querySelectorAll('#rb-type .opt').forEach(o=>o.classList.toggle('on',o.dataset.k===k));}
 function saveRename(){
   const v=(document.getElementById('rb-name').value||'').trim();
   if(!v){alert('Give the book a name');return;}
   const em=(document.getElementById('rb-emoji').value||'').trim()||null;
-  const b=book();b.name=v;b.emoji=em;persist();if(CLOUD)cloudUpdateBookMeta(b.id,v,em);
+  const b=book();b.name=v;b.emoji=em;b.kind=rbKind;persist();if(CLOUD)cloudUpdateBookMeta(b.id,v,em,rbKind);
   closePicker();renderAll();toast('Saved');
+}
+
+/* ---------- identity / account ---------- */
+function openIdentityPicker(isChange){
+  const html=`<div class="sheet"><h3>${isChange?'Change your name':'Who are you?'}</h3>
+    <div class="idsub">This tells the app who's signed in, so new expenses go in your name.</div>`+
+    PEOPLE.map(p=>`<div class="bookopt${me===p?' on':''}" onclick="pickIdentity('${p}')"><div class="bi"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.5 3.1-6 7-6s7 2.5 7 6"/></svg></div><div style="flex:1"><div class="bn">${p}</div></div>${me===p?'<span style="color:var(--accent);font-weight:800">✓</span>':''}</div>`).join('')
+    +`${isChange?'<button class="link" style="width:100%;padding:12px" onclick="closePicker()">Cancel</button>':''}</div>`;
+  document.body.appendChild(mkSheet(html));
+}
+async function pickIdentity(name){
+  me=name;insPerson=name;saveCur();
+  if(CLOUD){try{await supa.auth.updateUser({data:{name}});}catch(e){}}
+  closePicker();renderAll();renderDraft();
+}
+function openAccount(){
+  const html=`<div class="sheet"><h3>Account</h3>
+    <div class="acctcard"><div class="acctname"><span class="dot"></span>${escapeHtml(me)}</div><div class="acctmail">${escapeHtml(authEmail||'Local demo')}</div></div>
+    <div class="menurow" onclick="closePicker();openIdentityPicker(true)"><svg viewBox="0 0 24 24"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17z"/><path d="M13.5 7.5l3 3"/></svg>Change name</div>
+    ${CLOUD?`<div class="menurow danger" onclick="cloudSignOut()"><svg viewBox="0 0 24 24"><path d="M15 12H4M9 7l-5 5 5 5M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/></svg>Sign out</div>`:''}
+    <button class="link" style="width:100%;padding:12px" onclick="closePicker()">Close</button></div>`;
+  document.body.appendChild(mkSheet(html));
 }
 
 /* ---------- insights ---------- */
@@ -1063,6 +1140,7 @@ function personBooks(p){if(p==='all')return books.slice();return books.filter(b=
 function insShare(e){return insPerson==='all'?signedAmount(e):shareOf(e,insPerson);}  // 'All' = full amount (both members)
 function insSelectedBooks(){const pb=personBooks(insPerson);if(insBooksSel==='all')return pb;return pb.filter(b=>insBooksSel.includes(b.id));}
 function bookFamily(b){
+  if(b&&b.kind)return b.kind;
   const id=b.id, n=(b.name||'').toLowerCase();
   if(id==='couple'||id.indexOf('couple')===0||n.includes('couple'))return 'couple';
   if(id==='personal'||n.includes('personal'))return 'personal';
@@ -1240,8 +1318,8 @@ function fromRow(r){if(r.kind==='transfer')return {id:r.id,kind:'transfer',date:
 async function cloudInsertExpense(item,bookId){const {error}=await supa.from('expenses').insert(toRow(item,bookId));if(error)cloudWarn(error);}
 async function cloudUpsertExpense(item,bookId){const {error}=await supa.from('expenses').update(toRow(item,bookId||curId)).eq('id',item.id);if(error)cloudWarn(error);}
 async function cloudDeleteExpense(id){const {error}=await supa.from('expenses').delete().eq('id',id);if(error)cloudWarn(error);}
-async function cloudInsertBook(b){const {error}=await supa.from('books').insert({id:b.id,name:b.name,type:b.type,members:b.members,emoji:b.emoji||null,sort:Date.now()});if(error)cloudWarn(error);}
-async function cloudUpdateBookMeta(id,name,emoji){const {error}=await supa.from('books').update({name,emoji:emoji||null}).eq('id',id);if(error)cloudWarn(error);}
+async function cloudInsertBook(b){const {error}=await supa.from('books').insert({id:b.id,name:b.name,type:b.type,members:b.members,emoji:b.emoji||null,kind:b.kind||null,sort:Date.now()});if(error)cloudWarn(error);}
+async function cloudUpdateBookMeta(id,name,emoji,kind){const {error}=await supa.from('books').update({name,emoji:emoji||null,kind:kind||null}).eq('id',id);if(error)cloudWarn(error);}
 function cloudWarn(error){console.error(error);toast('Sync error — check connection');}
 async function cloudSignOut(){try{await supa.auth.signOut();}catch(e){}location.reload();}
 async function cloudFetch(){
@@ -1251,7 +1329,7 @@ async function cloudFetch(){
   ]);
   if(r1.error||r2.error){console.error(r1.error||r2.error);try{const s=localStorage.getItem(KEY);if(s)books=JSON.parse(s);}catch(_){}if(!books)books=JSON.parse(JSON.stringify(DEFAULT_BOOKS));return;}
   const map={};
-  books=(r1.data||[]).map(b=>{const bk={id:b.id,name:b.name,type:b.type,members:b.members,emoji:b.emoji||null,items:[]};map[b.id]=bk;return bk;});
+  books=(r1.data||[]).map(b=>{const bk={id:b.id,name:b.name,type:b.type,members:b.members,emoji:b.emoji||null,kind:b.kind||null,items:[]};map[b.id]=bk;return bk;});
   (r2.data||[]).forEach(r=>{const bk=map[r.book_id];if(!bk)return;bk.items.push(fromRow(r));});
   if(!books.length)books=JSON.parse(JSON.stringify(DEFAULT_BOOKS));
   try{localStorage.setItem(KEY,JSON.stringify(books));}catch(_){}
@@ -1263,8 +1341,19 @@ function subscribeRealtime(){
     .on('postgres_changes',{event:'*',schema:'public',table:'books'},queueRefetch)
     .subscribe();
 }
-function queueRefetch(){clearTimeout(rtTimer);rtTimer=setTimeout(async()=>{const kc=curId,km=me;await cloudFetch();curId=books.some(b=>b.id===kc)?kc:(books[0]&&books[0].id);me=(book().members.indexOf(km)>=0)?km:book().members[0];renderAll();},250);}
-async function cloudBoot(){await cloudFetch();restoreCur();insPerson=(me==='Chun')?'Chun':'Thibaud';newDraft();renderDraft();renderAppbar();go('add');subscribeRealtime();}
+function queueRefetch(){clearTimeout(rtTimer);rtTimer=setTimeout(async()=>{const kc=curId;await cloudFetch();curId=books.some(b=>b.id===kc)?kc:(books[0]&&books[0].id);renderAll();},250);}
+async function resolveIdentity(){
+  try{const {data}=await supa.auth.getUser();authEmail=data&&data.user?data.user.email:null;
+    const nm=data&&data.user&&data.user.user_metadata?data.user.user_metadata.name:null;
+    if(nm&&PEOPLE.includes(nm))me=nm;else return false;}catch(e){return false;}
+  return true;
+}
+async function cloudBoot(){
+  await cloudFetch();restoreCur();
+  const known=await resolveIdentity();          // login → person via display name
+  insPerson=me;newDraft();renderDraft();renderAppbar();go('add');subscribeRealtime();
+  if(!known)openIdentityPicker(false);          // first run for this login: pick once
+}
 function showLogin(){document.getElementById('login').classList.remove('hidden');}
 function hideLogin(){document.getElementById('login').classList.add('hidden');}
 async function doLogin(e){
