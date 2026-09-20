@@ -28,7 +28,7 @@
   svg{stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
   /* appbar */
   .appbar{position:sticky;top:0;z-index:15;background:var(--bg);
-    display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px;}
+    display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px 8px;}
   .bookchip{display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);
     color:var(--txt);font-size:15px;font-weight:700;padding:9px 14px;border-radius:22px;min-width:0;flex:0 1 auto;overflow:hidden;}
   .bookchip .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto;}
@@ -49,6 +49,33 @@
   .sdiv{width:1px;background:var(--line);margin:9px 0;flex:0 0 auto;}
   .scol.sbal{cursor:pointer;}
   .scol.sbal .sval{color:var(--accent);}
+  .scol.sins{cursor:pointer;}
+  .scol.sins .sval{color:var(--accent);}
+  /* month stepper above the summary strip (3-zone: month stays centered, optional right slot) */
+  .monthnav{display:flex;align-items:center;gap:8px;padding:2px 16px 8px;}
+  .monthnav .mnside{flex:1;display:flex;min-width:0;}
+  .monthnav .mnside.r{justify-content:flex-end;}
+  .monthnav .mncenter{display:flex;align-items:center;gap:16px;flex:0 0 auto;}
+  .monthnav .mlab{font-size:14px;font-weight:700;color:var(--txt);min-width:130px;text-align:center;}
+  .monthnav .mncenter button{width:32px;height:32px;border-radius:50%;background:var(--card);border:1px solid var(--line);
+    color:var(--txt);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
+  .monthnav .mncenter button svg{width:16px;height:16px;}
+  .monthnav .mncenter button:disabled{opacity:.35;cursor:default;}
+  /* work include switch (borderless) */
+  .wsw{display:inline-flex;align-items:center;gap:7px;background:none;border:0;padding:0;cursor:pointer;font-size:11.5px;font-weight:600;color:var(--sub);font-family:inherit;}
+  .sw{width:26px;height:15px;border-radius:8px;position:relative;flex:none;background:var(--muted);}
+  .sw.on{background:var(--accent);}
+  .sw .kn{position:absolute;top:2px;width:11px;height:11px;border-radius:50%;background:#fff;transition:left .12s;}
+  .sw.off .kn{left:2px;}
+  .sw.on .kn{left:13px;}
+  /* work eye column in the summary strip */
+  .scol.wk .sval{display:inline-flex;align-items:center;gap:4px;justify-content:center;}
+  .scol.wk .sval svg{width:14px;height:14px;}
+  .scol.wk.ghost .slbl,.scol.wk.ghost .sval{color:var(--muted);}
+  .scol.wk.inc .slbl,.scol.wk.inc .sval{color:var(--txt);}
+  /* insights work line under the total */
+  .inswork{display:flex;align-items:center;justify-content:space-between;margin:10px 0 2px;padding-top:10px;border-top:1px solid var(--line);}
+  .inswork .iwtx{font-size:12px;color:var(--sub);}
   .sumcard{flex:1;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;}
   .sumcard .lbl{font-size:12px;color:var(--sub);margin-bottom:3px;}
   .sumcard .val{font-size:20px;font-weight:800;letter-spacing:-.4px;}
@@ -68,9 +95,21 @@
   .ico.tr{background:var(--accent-soft);color:var(--accent);}
   .rmid{flex:1;min-width:0;}
   .rdesc{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .rmeta{font-size:12px;color:var(--sub);margin-top:1px;}
-  .solomark{font-weight:600;color:var(--txt);}
+  .rmeta{font-size:12px;color:var(--sub);margin-top:4px;}
+  .solomark{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:6px;background:var(--accent-soft);color:var(--accent);vertical-align:1px;}
+  /* harmonized meta line: book emoji+name crops first, payer/beneficiary pinned */
+  .mrow{display:flex;align-items:center;min-width:0;overflow:hidden;}
+  .mrow .msep{flex:0 0 auto;margin:0 5px;color:var(--muted);}
+  .mrow .mpay{flex:0 0 auto;white-space:nowrap;}
+  .bkin{display:inline-flex;align-items:center;gap:4px;min-width:22px;flex:0 1 auto;overflow:hidden;
+    background:var(--card2);border-radius:6px;padding:1px 7px;color:var(--sub);}
+  .bkin .bke{flex:0 0 auto;display:inline-flex;}
+  .bkin .bke .emo{font-size:11px;line-height:1;}
+  .bkin .bke svg{width:11px;height:11px;color:var(--sub);}
+  .bkin .bkt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;max-width:130px;font-weight:600;}
   .ramt{font-size:16px;font-weight:800;letter-spacing:-.3px;white-space:nowrap;}
+  .ramt.tr{color:var(--muted);font-weight:700;display:inline-flex;align-items:center;gap:4px;justify-content:flex-end;}
+  .ramt.tr svg{width:13px;height:13px;}
   .pill{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;
     background:var(--accent-soft);color:var(--accent);margin-left:6px;vertical-align:1px;}
   .empty{color:var(--muted);text-align:center;padding:50px 24px;font-size:14px;line-height:1.6;}
@@ -342,6 +381,7 @@
     </button>
     <div class="appbar-right">
       <button class="iconbtn hidden" id="search-btn" onclick="toggleSearch()" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.4-3.4"/></svg></button>
+      <button class="iconbtn hidden" id="ins-btn" onclick="openBookInsights()" aria-label="Insights"><svg viewBox="0 0 24 24"><path d="M4 20V4M4 20h16M8 20v-6M12.5 20v-10M17 20v-4"/></svg></button>
       <button class="iconbtn hidden" id="book-menu-btn" onclick="openBookMenu()" aria-label="Book options"><svg viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg></button>
       <button class="whoami hidden" id="whoami" onclick="openAccount()"><span class="dot"></span><span id="me-name">Thibaud</span></button>
     </div>
@@ -442,6 +482,8 @@
 </div>
 
 <script>
+/* ---------- app version (bump on each shipped build; see CHANGELOG.md) ---------- */
+const APP_VERSION='1.3';
 /* ---------- cloud config ---------- */
 const SUPABASE_URL='https://uhbfcrajquihzkdbeooo.supabase.co';          // <-- paste your Supabase Project URL
 const SUPABASE_ANON_KEY='sb_publishable_5cOEagITv7fEtmJTKqcEmQ_f4KfNYcP';  // Supabase publishable (public) key     // <-- paste your Supabase anon public key
@@ -496,6 +538,8 @@ const KEY='expenses_books_v3';
 
 let books, curId='couple', me='Thibaud', draft, view='add';
 let searchOpen=false, searchQuery='', allMode=false, authEmail=null;
+let listMonth=new Date().toISOString().slice(0,7), listMonthBook=null;
+let includeWork=(()=>{try{return localStorage.getItem('inc_work')==='1';}catch(e){return false;}})();
 const PEOPLE=['Thibaud','Chun'];
 function otherPerson(){return me===PEOPLE[0]?PEOPLE[1]:PEOPLE[0];}
 function canEdit(b){return !!b&&(b.type==='shared'||b.members[0]===me);}   // shared or your own solo book
@@ -560,6 +604,7 @@ function renderAppbar(){
   if(showWho){w.classList.remove('hidden');document.getElementById('me-name').textContent=me;}
   else w.classList.add('hidden');
   document.getElementById('search-btn').classList.toggle('hidden',view!=='list');
+  document.getElementById('ins-btn').classList.toggle('hidden',view!=='list');
   document.getElementById('book-menu-btn').classList.toggle('hidden',!(view==='list'&&!allMode&&canEdit(b)));
   document.getElementById('appbar').classList.toggle('hidden',view==='books'||view==='insights'||view==='catdetail');
 }
@@ -573,87 +618,131 @@ function balDirValue(b){const n=meNet(b);return money(Math.abs(n)<0.01?0:Math.ab
 function renderList(){
   if(allMode)return renderAllList();
   const b=book();
+  if(curId!==listMonthBook){listMonth=new Date().toISOString().slice(0,7);listMonthBook=curId;}
+  const monthly=((b.kind||bookFamily(b))!=='trip');   // trips are cumulative; everything else is monthly
+  const searching=(view==='list'&&!!searchQuery);
+  const useMonth=monthly&&!searching;              // filter list to listMonth unless searching
   let items=[...b.items].sort((a,z)=>a.date<z.date?1:a.date>z.date?-1:0);
-  if(view==='list'&&searchQuery)items=items.filter(e=>matchExp(e,searchQuery));
-  let grand=0,my=0;
-  b.items.forEach(e=>{if(e.kind==='transfer')return;grand+=signedAmount(e);my+=shareOf(e,me);});
+  if(searching)items=items.filter(e=>matchExp(e,searchQuery));
+  else if(useMonth)items=items.filter(e=>e.date.slice(0,7)===listMonth);
+  const perItems=useMonth?b.items.filter(e=>e.date.slice(0,7)===listMonth):b.items;
+  let grand=0,my=0;perItems.forEach(e=>{if(e.kind==='transfer')return;grand+=signedAmount(e);my+=shareOf(e,me);});
+  let allGrand=0;b.items.forEach(e=>{if(e.kind==='transfer')return;allGrand+=signedAmount(e);});
   const sum=document.getElementById('summary');
   const bb=document.getElementById('balbar');bb.innerHTML='';bb.classList.add('hidden');
+  const cm=new Date().toISOString().slice(0,7);
+  const nav=(monthly&&!searching)?monthNavHtml():'';
+  const [ly,lm]=listMonth.split('-');
+  const totLab=(monthly&&!searching)?new Date(+ly,+lm-1,1).toLocaleDateString('en-US',{month:'long'}):'Total';
+  const col1=`<button class="scol sins" onclick="openBookInsights()"><div class="slbl">${totLab}</div><div class="sval">${money(grand)} ›</div></button>`;
   if(isShared()){
-    sum.innerHTML=`<div class="strip">
-      <div class="scol"><div class="slbl">Total</div><div class="sval">${money(grand)}</div></div>
+    sum.innerHTML=nav+`<div class="strip">
+      ${col1}
       <div class="sdiv"></div>
-      <div class="scol"><div class="slbl">${me}'s share</div><div class="sval">${money(my)}</div></div>
+      <div class="scol"><div class="slbl">Your share</div><div class="sval">${money(my)}</div></div>
       <div class="sdiv"></div>
       <button class="scol sbal" onclick="go('bal')"><div class="slbl">${balDirLabel(b)}</div><div class="sval">${balDirValue(b)} ›</div></button>
     </div>`;
   }else{
-    sum.innerHTML=`<div class="strip"><div class="scol"><div class="slbl">Total · ${escapeHtml(b.name)}</div><div class="sval">${money(grand)}</div></div></div>`;
+    const col2=monthly?`<div class="sdiv"></div><div class="scol"><div class="slbl">All time</div><div class="sval">${money(allGrand)}</div></div>`:'';
+    sum.innerHTML=nav+`<div class="strip">${col1}${col2}</div>`;
   }
   const box=document.getElementById('list');
-  if(!items.length){box.innerHTML=searchQuery?'<div class="empty">No matches for “'+escapeHtml(searchQuery)+'”.</div>':'<div class="empty">No expenses in this book yet.<br>Tap <b>Add</b> to log one.</div>';return;}
+  if(!items.length){box.innerHTML=searching?'<div class="empty">No matches for “'+escapeHtml(searchQuery)+'”.</div>':(useMonth?'<div class="empty">No expenses in '+fmtMonthFull(listMonth)+'.</div>':'<div class="empty">No expenses in this book yet.<br>Tap <b>Add</b> to log one.</div>');return;}
   let html='',cur=null;
   items.forEach(e=>{
     if(e.date!==cur){cur=e.date;html+=`<div class="dayhdr">${fmtDay(e.date)}</div>`;}
     if(e.kind==='transfer'){
       html+=`<div class="row" onclick="openEditor('${e.id}')">
         <div class="ico tr"><svg viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg></div>
-        <div class="rmid"><div class="rdesc">${escapeHtml(e.desc||'Transfer')}<span class="pill">transfer</span></div><div class="rmeta">${e.from} → ${e.to}</div></div>
-        <div class="ramt">${money(e.amount)}</div></div>`;
+        <div class="rmid"><div class="rdesc">${escapeHtml(e.desc||'Transfer')}</div><div class="rmeta mrow"><span class="mpay">${escapeHtml(e.from)} → ${escapeHtml(e.to)}</span></div></div>
+        <div class="ramt tr">${TRGLYPH}${money(e.amount)}</div></div>`;
       return;
     }
     const isInc=e.kind==='income';
-    const badge=isInc?`<span class="pill" style="background:#e3f4ea;color:var(--green)">credit</span>`:'';
-    let meta;
-    if(!isShared())meta=escapeHtml(e.cat);
-    else meta=`${paidDescriptor(e,book().members)} · ${escapeHtml(e.cat)}`;
     const cc=CATCOLOR[e.cat]||CATCOLOR['Other'];
     const amtHtml=isInc?`<span style="color:var(--green)">+${money(e.amount)}</span>`:money(e.amount);
+    const meta=isShared()?`<div class="rmeta mrow"><span class="mpay">${paidDescriptor(e,book().members)}</span></div>`:'';
     html+=`<div class="row" onclick="openEditor('${e.id}')">
       <div class="ico" style="background:${cc[0]};color:${cc[2]}">${svg(e.cat)}</div>
-      <div class="rmid"><div class="rdesc">${escapeHtml(e.desc||e.cat)}${badge}</div><div class="rmeta">${meta}</div></div>
+      <div class="rmid"><div class="rdesc">${escapeHtml(e.desc||e.cat)}</div>${meta}</div>
       <div class="ramt">${amtHtml}</div></div>`;
   });
   box.innerHTML=html;
 }
-/* payer/beneficiary descriptor for a shared item (no category) — used by the list + all-expenses view */
+function monthNavHtml(trailing){const cm=new Date().toISOString().slice(0,7);const t=trailing||'';return `<div class="monthnav"><div class="mnside"></div><div class="mncenter"><button onclick="listStep(-1)" aria-label="Previous month"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><span class="mlab">${fmtMonthFull(listMonth)}</span><button onclick="listStep(1)" aria-label="Next month"${listMonth>=cm?' disabled':''}><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="mnside r">${t}</div></div>`;}
+function listStep(dir){const cm=new Date().toISOString().slice(0,7);const p=stepPeriod('month',listMonth,dir);if(p>cm)return;listMonth=p;renderList();}
+function openBookInsights(){if(allMode){insBooksSel='all';insPerson='all';insScopeV='month';insPeriod=listMonth;go('insights');return;}const b=book();insBooksSel=[b.id];insPerson='all';insScopeV=((b.kind||bookFamily(b))==='trip')?'all':'month';insPeriod=listMonth;go('insights');}
+/* ---------- work include/exclude (v1.3) ---------- */
+function isWorkBook(b){return (b.kind||bookFamily(b))==='work';}
+const EYE='<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="2.6"/></svg>';
+const EYEOFF='<svg viewBox="0 0 24 24"><path d="M4 4l16 16"/><path d="M9.6 5.2A10.6 10.6 0 0 1 12 5c6.4 0 10 7 10 7a16.7 16.7 0 0 1-3 3.9M6.2 6.2A16.6 16.6 0 0 0 2 12s3.6 7 10 7a10 10 0 0 0 3.3-.5"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+function workSwitchHtml(){return `<button class="wsw" onclick="toggleWork()" aria-label="Include work expenses"><span>Work</span><span class="sw ${includeWork?'on':'off'}"><span class="kn"></span></span></button>`;}
+function toggleWork(){includeWork=!includeWork;try{localStorage.setItem('inc_work',includeWork?'1':'0');}catch(e){}renderAll();}
+/* ---------- harmonized expense-row helpers (v1.1) ---------- */
+const SEP='<span class="msep">·</span>';
+const TRGLYPH='<svg viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>';
+/* current-user-relative name: "you" for me, the name otherwise */
+function pname(w){return w===me?'you':w;}
+function capFirst(s){return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
+function soloBadge(w){return `<span class="solomark">${capFirst(escapeHtml(pname(w)))} only</span>`;}
+/* book shown inline in the meta line: its own emoji/icon + name (name crops first) */
+function bookInline(b){return `<span class="bkin"><span class="bke">${bookIcon(b)}</span><span class="bkt">${escapeHtml(b.name)}</span></span>`;}
+/* payer/beneficiary descriptor for an item (no category, no book) */
 function paidDescriptor(e,M){
-  if(e.kind==='income')return `Received by ${e.paidBy}`;
-  if(e.split==='mine')return `<span class="solomark">${e.paidBy} only</span>`;
+  if(e.kind==='income')return `Credit to ${escapeHtml(pname(e.paidBy))}`;
+  if(M&&M.length===1)return soloBadge(M[0]);                 // personal book → solo of owner
+  if(e.split==='mine')return soloBadge(e.paidBy);
   if(e.split==='custom'&&e.shares){
     const other=(M[0]===e.paidBy)?M[1]:M[0];
     const sp=e.shares[e.paidBy]||0, so=e.shares[other]||0;
-    if(Math.abs(sp-e.amount)<0.01&&Math.abs(so)<0.01)return `<span class="solomark">${e.paidBy} only</span>`;
-    if(Math.abs(so-e.amount)<0.01&&Math.abs(sp)<0.01)return `Paid by ${e.paidBy} · <span class="solomark">for ${other} only</span>`;
+    if(Math.abs(sp-e.amount)<0.01&&Math.abs(so)<0.01)return soloBadge(e.paidBy);
+    if(Math.abs(so-e.amount)<0.01&&Math.abs(sp)<0.01)return soloBadge(other)+` · paid by ${escapeHtml(pname(e.paidBy))}`;
   }
-  return `Paid by ${e.paidBy}`;
+  return `Paid by ${escapeHtml(pname(e.paidBy))}`;
 }
 function renderAllList(){
+  if(listMonthBook!=='__all__'){listMonth=new Date().toISOString().slice(0,7);listMonthBook='__all__';}
+  const searching=!!searchQuery;
   let rows=[];
-  books.forEach(b=>b.items.forEach(e=>{if(!searchQuery||matchExp(e,searchQuery))rows.push({b,e});}));
+  books.forEach(b=>{const w=isWorkBook(b);b.items.forEach(e=>{
+    if(searching){if(!matchExp(e,searchQuery))return;}
+    else{if(e.date.slice(0,7)!==listMonth)return;if(w&&!includeWork)return;}
+    rows.push({b,e});});});
   rows.sort((x,z)=>x.e.date<z.e.date?1:x.e.date>z.e.date?-1:0);
-  let grand=0,my=0;
-  books.forEach(b=>{const inb=b.members.includes(me);b.items.forEach(e=>{if(e.kind==='transfer')return;grand+=signedAmount(e);if(inb)my+=shareOf(e,me);});});
-  document.getElementById('summary').innerHTML=`<div class="strip">
-    <div class="scol"><div class="slbl">Total · all books</div><div class="sval">${money(grand)}</div></div>
+  let myNW=0,allNW=0,myW=0,allW=0;
+  books.forEach(b=>{const inb=b.members.includes(me);const w=isWorkBook(b);b.items.forEach(e=>{
+    if(e.kind==='transfer')return;if(e.date.slice(0,7)!==listMonth)return;
+    const sa=signedAmount(e),sh=inb?shareOf(e,me):0;
+    if(w){allW+=sa;myW+=sh;}else{allNW+=sa;myNW+=sh;}
+  });});
+  const myM=includeWork?myNW+myW:myNW, allM=includeWork?allNW+allW:allNW;
+  const hasOwnWork=Math.abs(myW)>0.005;   // eye column: only when YOU have work of your own
+  const hasAnyWork=Math.abs(allW)>0.005;  // switch: whenever any work exists (affects All books)
+  const nav=searching?'':monthNavHtml(hasAnyWork?workSwitchHtml():'');
+  const workCol=(hasOwnWork&&!searching)?`<div class="sdiv"></div><div class="scol wk ${includeWork?'inc':'ghost'}"><div class="slbl">Work</div><div class="sval">${includeWork?EYE:EYEOFF}${money(myW)}</div></div>`:'';
+  document.getElementById('summary').innerHTML=nav+`<div class="strip">
+    <div class="scol"><div class="slbl">Your share</div><div class="sval">${money(myM)}</div></div>
     <div class="sdiv"></div>
-    <div class="scol"><div class="slbl">${me}'s share</div><div class="sval">${money(my)}</div></div></div>`;
+    <button class="scol sins" onclick="openBookInsights()"><div class="slbl">All books</div><div class="sval">${money(allM)} ›</div></button>
+    ${workCol}</div>`;
   const bb=document.getElementById('balbar');bb.innerHTML='';bb.classList.add('hidden');
   const box=document.getElementById('list');
-  if(!rows.length){box.innerHTML=searchQuery?'<div class="empty">No matches for “'+escapeHtml(searchQuery)+'”.</div>':'<div class="empty">No expenses yet.</div>';return;}
+  if(!rows.length){box.innerHTML=searching?'<div class="empty">No matches for “'+escapeHtml(searchQuery)+'”.</div>':'<div class="empty">No expenses in '+fmtMonthFull(listMonth)+'.</div>';return;}
   let html='',cur=null;
   rows.forEach(({b,e})=>{
     if(e.date!==cur){cur=e.date;html+=`<div class="dayhdr">${fmtDay(e.date)}</div>`;}
-    const paidSeg=(b.type==='shared'&&e.kind!=='transfer')?`<span class="bkp"> · ${paidDescriptor(e,b.members)}</span>`:'';
-    const meta=`<div class="rmeta rall"><span class="bkn">${escapeHtml(b.name)}</span>${paidSeg}<span class="bkd"> · ${fmtDayShort(e.date)}</span></div>`;
+    let payHtml='';
+    if(e.kind==='transfer')payHtml=`${SEP}<span class="mpay">${escapeHtml(e.from)} → ${escapeHtml(e.to)}</span>`;
+    else if(b.type==='shared')payHtml=`${SEP}<span class="mpay">${paidDescriptor(e,b.members)}</span>`;
+    const meta=`<div class="rmeta mrow">${bookInline(b)}${payHtml}</div>`;
     if(e.kind==='transfer'){
-      html+=`<div class="row" onclick="openFromAll('${b.id}','${e.id}')"><div class="ico tr"><svg viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg></div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||'Transfer')}<span class="pill">transfer</span></div>${meta}</div><div class="ramt">${money(e.amount)}</div></div>`;
+      html+=`<div class="row" onclick="openFromAll('${b.id}','${e.id}')"><div class="ico tr"><svg viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg></div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||'Transfer')}</div>${meta}</div><div class="ramt tr">${TRGLYPH}${money(e.amount)}</div></div>`;
       return;
     }
     const isInc=e.kind==='income';const cc=CATCOLOR[e.cat]||CATCOLOR['Other'];
     const amtHtml=isInc?`<span style="color:var(--green)">+${money(e.amount)}</span>`:money(e.amount);
-    const badge=isInc?`<span class="pill" style="background:#e3f4ea;color:var(--green)">credit</span>`:'';
-    html+=`<div class="row" onclick="openFromAll('${b.id}','${e.id}')"><div class="ico" style="background:${cc[0]};color:${cc[2]}">${svg(e.cat)}</div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||e.cat)}${badge}</div>${meta}</div><div class="ramt">${amtHtml}</div></div>`;
+    html+=`<div class="row" onclick="openFromAll('${b.id}','${e.id}')"><div class="ico" style="background:${cc[0]};color:${cc[2]}">${svg(e.cat)}</div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||e.cat)}</div>${meta}</div><div class="ramt">${amtHtml}</div></div>`;
   });
   box.innerHTML=html;
 }
@@ -1011,10 +1100,12 @@ function lastActivity(b){let m='';b.items.forEach(e=>{if(e.date>m)m=e.date;});re
 function kindIcon(b){return BOOKICON[bookFamily(b)]||BOOKICON.other;}
 function bookSettled(b){return b.type==='shared'&&b.items.length>0&&Math.abs(computeBalance(b).net)<0.01;}
 function searchRow(b,e){
-  const chip=`<span class="bchip"><span class="bchip-i">${bookIcon(b)}</span>${escapeHtml(b.name)}</span>`;
-  const meta=`<div class="rmeta">${chip} · ${fmtDayShort(e.date)}</div>`;
+  let payHtml='';
+  if(e.kind==='transfer')payHtml=`${SEP}<span class="mpay">${escapeHtml(e.from)} → ${escapeHtml(e.to)}</span>`;
+  else if(b.type==='shared')payHtml=`${SEP}<span class="mpay">${paidDescriptor(e,b.members)}</span>`;
+  const meta=`<div class="rmeta mrow">${bookInline(b)}${payHtml}</div>`;
   if(e.kind==='transfer'){
-    return `<div class="row" onclick="openFromSearch('${b.id}','${e.id}')"><div class="ico tr"><svg viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg></div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||'Transfer')}<span class="pill">transfer</span></div>${meta}</div><div class="ramt">${money(e.amount)}</div></div>`;
+    return `<div class="row" onclick="openFromSearch('${b.id}','${e.id}')"><div class="ico tr"><svg viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg></div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||'Transfer')}</div>${meta}</div><div class="ramt tr">${TRGLYPH}${money(e.amount)}</div></div>`;
   }
   const cc=CATCOLOR[e.cat]||CATCOLOR['Other'];const isInc=e.kind==='income';
   const amtHtml=isInc?`<span style="color:var(--green)">+${money(e.amount)}</span>`:money(e.amount);
@@ -1131,6 +1222,7 @@ function openAccount(){
     <div class="acctcard"><div class="acctname"><span class="dot"></span>${escapeHtml(me)}</div><div class="acctmail">${escapeHtml(authEmail||'Local demo')}</div></div>
     <div class="menurow" onclick="closePicker();openIdentityPicker(true)"><svg viewBox="0 0 24 24"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17z"/><path d="M13.5 7.5l3 3"/></svg>Change name</div>
     ${CLOUD?`<div class="menurow danger" onclick="cloudSignOut()"><svg viewBox="0 0 24 24"><path d="M15 12H4M9 7l-5 5 5 5M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/></svg>Sign out</div>`:''}
+    <div style="text-align:center;color:var(--muted);font-size:12px;padding:10px 0 2px">Version ${APP_VERSION}</div>
     <button class="link" style="width:100%;padding:12px" onclick="closePicker()">Close</button></div>`;
   document.body.appendChild(mkSheet(html));
 }
@@ -1138,7 +1230,9 @@ function openAccount(){
 /* ---------- insights ---------- */
 function personBooks(p){if(p==='all')return books.slice();return books.filter(b=>b.members.includes(p));}
 function insShare(e){return insPerson==='all'?signedAmount(e):shareOf(e,insPerson);}  // 'All' = full amount (both members)
-function insSelectedBooks(){const pb=personBooks(insPerson);if(insBooksSel==='all')return pb;return pb.filter(b=>insBooksSel.includes(b.id));}
+function insSelectedBooks(){const pb=personBooks(insPerson);if(insBooksSel==='all')return includeWork?pb:pb.filter(b=>!isWorkBook(b));return pb.filter(b=>insBooksSel.includes(b.id));}
+/* work spend in the current insights scope (for the toggle line) */
+function insWorkTotal(){const pred=periodPred(insScopeV,insPeriod);let t=0;personBooks(insPerson).forEach(b=>{if(!isWorkBook(b))return;b.items.forEach(e=>{if(e.kind==='transfer'||!pred(e))return;const s=insShare(e);if(s)t+=s;});});return t;}
 function bookFamily(b){
   if(b&&b.kind)return b.kind;
   const id=b.id, n=(b.name||'').toLowerCase();
@@ -1247,6 +1341,7 @@ function renderInsights(){
   body.innerHTML=`<div class="inscard">
       <div class="insstep"><button class="nav" ${dis} onclick="insStep(-1)">‹</button><span class="plabel">${escapeHtml(plabel)}</span><button class="nav" ${dis} onclick="insStep(1)">›</button></div>
       <div class="instot"><span class="big">${money(tot)}</span>${deltaHtml}</div>
+      ${(insBooksSel==='all'&&Math.abs(insWorkTotal())>0.005)?`<div class="inswork"><span class="iwtx">Work · ${money(insWorkTotal())} ${includeWork?'included':'excluded'}</span>${workSwitchHtml()}</div>`:''}
       ${showAvg?`<div class="insavg">avg ${money(tot/nMonths)}/mo · ${nMonths} month${nMonths>1?'s':''} with data</div>`:''}
       <div class="trend">${bars}</div>
       <div class="trendcap">${cap}</div>
@@ -1269,9 +1364,10 @@ function renderCatDetail(){
   let cur=null;
   rows.forEach(({b,e,s})=>{
     if(e.date!==cur){cur=e.date;html+=`<div class="dayhdr">${fmtDay(e.date)}</div>`;}
-    const cc=CATCOLOR[e.cat]||CATCOLOR['Other'];const badge=`<span class="bookbadge">${escapeHtml(b.name)}</span>`;
-    const meta=b.type==='shared'?('your share'+(e.amount!==s?' · of '+money(e.amount):'')):'full amount';
-    html+=`<div class="row" onclick="openFromSearch('${b.id}','${e.id}')"><div class="ico" style="background:${cc[0]};color:${cc[2]}">${svg(e.cat)}</div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||e.cat)}${badge}</div><div class="rmeta">${meta}</div></div><div class="ramt">${money(s)}</div></div>`;
+    const cc=CATCOLOR[e.cat]||CATCOLOR['Other'];
+    const ofSeg=(b.type==='shared'&&Math.abs(e.amount-s)>=0.01)?`${SEP}<span class="mpay">of ${money(e.amount)}</span>`:'';
+    const meta=`<div class="rmeta mrow">${bookInline(b)}${ofSeg}</div>`;
+    html+=`<div class="row" onclick="openFromSearch('${b.id}','${e.id}')"><div class="ico" style="background:${cc[0]};color:${cc[2]}">${svg(e.cat)}</div><div class="rmid"><div class="rdesc">${escapeHtml(e.desc||e.cat)}</div>${meta}</div><div class="ramt">${money(s)}</div></div>`;
   });
   document.getElementById('cd-body').innerHTML=html;
 }
