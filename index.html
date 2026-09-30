@@ -483,7 +483,7 @@
 
 <script>
 /* ---------- app version (bump on each shipped build; see CHANGELOG.md) ---------- */
-const APP_VERSION='1.3';
+const APP_VERSION='1.3.2';
 /* ---------- cloud config ---------- */
 const SUPABASE_URL='https://uhbfcrajquihzkdbeooo.supabase.co';          // <-- paste your Supabase Project URL
 const SUPABASE_ANON_KEY='sb_publishable_5cOEagITv7fEtmJTKqcEmQ_f4KfNYcP';  // Supabase publishable (public) key     // <-- paste your Supabase anon public key
@@ -538,13 +538,16 @@ const KEY='expenses_books_v3';
 
 let books, curId='couple', me='Thibaud', draft, view='add';
 let searchOpen=false, searchQuery='', allMode=false, authEmail=null;
-let listMonth=new Date().toISOString().slice(0,7), listMonthBook=null;
+/* local-time date helpers (avoid UTC month-boundary bugs) */
+function todayISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function curMonth(){return todayISO().slice(0,7);}
+let listMonth=curMonth(), listMonthBook=null;
 let includeWork=(()=>{try{return localStorage.getItem('inc_work')==='1';}catch(e){return false;}})();
 const PEOPLE=['Thibaud','Chun'];
 function otherPerson(){return me===PEOPLE[0]?PEOPLE[1]:PEOPLE[0];}
 function canEdit(b){return !!b&&(b.type==='shared'||b.members[0]===me);}   // shared or your own solo book
 function fmtDayShort(d){return new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});}
-let insPerson='Thibaud', insScopeV='month', insPeriod=new Date().toISOString().slice(0,7), insBooksSel='all', cdCat=null, insByBook=false;
+let insPerson='Thibaud', insScopeV='month', insPeriod=curMonth(), insBooksSel='all', cdCat=null, insByBook=false;
 // book colors by KIND (family), with distinct shades within a family
 const BOOKFAM={
   couple:['#1f9d55','#15803d','#3cc27a','#0f5f34'],   // greens
@@ -618,7 +621,7 @@ function balDirValue(b){const n=meNet(b);return money(Math.abs(n)<0.01?0:Math.ab
 function renderList(){
   if(allMode)return renderAllList();
   const b=book();
-  if(curId!==listMonthBook){listMonth=new Date().toISOString().slice(0,7);listMonthBook=curId;}
+  if(curId!==listMonthBook){listMonth=curMonth();listMonthBook=curId;}
   const monthly=((b.kind||bookFamily(b))!=='trip');   // trips are cumulative; everything else is monthly
   const searching=(view==='list'&&!!searchQuery);
   const useMonth=monthly&&!searching;              // filter list to listMonth unless searching
@@ -630,7 +633,7 @@ function renderList(){
   let allGrand=0;b.items.forEach(e=>{if(e.kind==='transfer')return;allGrand+=signedAmount(e);});
   const sum=document.getElementById('summary');
   const bb=document.getElementById('balbar');bb.innerHTML='';bb.classList.add('hidden');
-  const cm=new Date().toISOString().slice(0,7);
+  const cm=curMonth();
   const nav=(monthly&&!searching)?monthNavHtml():'';
   const [ly,lm]=listMonth.split('-');
   const totLab=(monthly&&!searching)?new Date(+ly,+lm-1,1).toLocaleDateString('en-US',{month:'long'}):'Total';
@@ -670,8 +673,8 @@ function renderList(){
   });
   box.innerHTML=html;
 }
-function monthNavHtml(trailing){const cm=new Date().toISOString().slice(0,7);const t=trailing||'';return `<div class="monthnav"><div class="mnside"></div><div class="mncenter"><button onclick="listStep(-1)" aria-label="Previous month"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><span class="mlab">${fmtMonthFull(listMonth)}</span><button onclick="listStep(1)" aria-label="Next month"${listMonth>=cm?' disabled':''}><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="mnside r">${t}</div></div>`;}
-function listStep(dir){const cm=new Date().toISOString().slice(0,7);const p=stepPeriod('month',listMonth,dir);if(p>cm)return;listMonth=p;renderList();}
+function monthNavHtml(trailing){const cm=curMonth();const t=trailing||'';return `<div class="monthnav"><div class="mnside"></div><div class="mncenter"><button onclick="listStep(-1)" aria-label="Previous month"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><span class="mlab">${fmtMonthFull(listMonth)}</span><button onclick="listStep(1)" aria-label="Next month"${listMonth>=cm?' disabled':''}><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="mnside r">${t}</div></div>`;}
+function listStep(dir){const cm=curMonth();const p=stepPeriod('month',listMonth,dir);if(p>cm)return;listMonth=p;renderList();}
 function openBookInsights(){if(allMode){insBooksSel='all';insPerson='all';insScopeV='month';insPeriod=listMonth;go('insights');return;}const b=book();insBooksSel=[b.id];insPerson='all';insScopeV=((b.kind||bookFamily(b))==='trip')?'all':'month';insPeriod=listMonth;go('insights');}
 /* ---------- work include/exclude (v1.3) ---------- */
 function isWorkBook(b){return (b.kind||bookFamily(b))==='work';}
@@ -702,7 +705,7 @@ function paidDescriptor(e,M){
   return `Paid by ${escapeHtml(pname(e.paidBy))}`;
 }
 function renderAllList(){
-  if(listMonthBook!=='__all__'){listMonth=new Date().toISOString().slice(0,7);listMonthBook='__all__';}
+  if(listMonthBook!=='__all__'){listMonth=curMonth();listMonthBook='__all__';}
   const searching=!!searchQuery;
   let rows=[];
   books.forEach(b=>{const w=isWorkBook(b);b.items.forEach(e=>{
@@ -891,7 +894,7 @@ function renderBal(){
 
 /* ---------- capture ---------- */
 function newDraft(){
-  const iso=new Date().toISOString().slice(0,10);
+  const iso=todayISO();
   draft={kind:'expense',cat:'Groceries',paidBy:me,split:'ours',date:iso,isToday:true,customShare:null,from:null,to:null};
   splitPanelOpen=false;typePanelOpen=false;
   const ai=document.getElementById('amt-input');if(ai)ai.value='';
@@ -1004,7 +1007,7 @@ function setPaid(p){draft.paidBy=p;renderDraft();}
 function setSplit(s){draft.split=s;if(s==='custom'){if(draft.customShare==null)draft.customShare=+((amountVal()||0)/2).toFixed(2);splitPanelOpen=true;}else{splitPanelOpen=false;}renderDraft();}
 function onDateChange(){
   const v=document.getElementById('date-input').value;if(!v)return;
-  draft.date=v;draft.isToday=(v===new Date().toISOString().slice(0,10));
+  draft.date=v;draft.isToday=(v===todayISO());
   document.getElementById('date-label').textContent=draft.isToday?'Today':fmtDay(v);
 }
 function save(){
@@ -1027,7 +1030,7 @@ function save(){
       }
     }else{item.paidBy=b.members[0];item.split='solo';}
   }
-  b.items.push(item);persist();renderAll();toast('Saved to '+(b.name));if(CLOUD)cloudInsertExpense(item,b.id);
+  b.items.push(item);listMonth=item.date.slice(0,7);listMonthBook=b.id;persist();renderAll();toast('Saved to '+(b.name));if(CLOUD)cloudInsertExpense(item,b.id);
   newDraft();renderDraft();focusAmount();
 }
 
@@ -1268,7 +1271,7 @@ function insBarTap(period){if(insScopeV==='month')insPeriod=period;else if(insSc
 function insStep(dir){insPeriod=stepPeriod(insScopeV,insPeriod,dir);renderInsights();}
 function setInsScope(s){
   if(s===insScopeV)return;
-  const cur=new Date().toISOString().slice(0,10);
+  const cur=todayISO();
   if(s==='year'){insPeriod=(insPeriod&&insPeriod.slice(0,4))||cur.slice(0,4);}
   else if(s==='month'){const y=(insPeriod&&insPeriod.slice(0,4))||cur.slice(0,4);let mm;if(insScopeV==='year')mm=(y===cur.slice(0,4))?cur.slice(5,7):'12';else mm=(insPeriod&&/^\d{4}-\d{2}/.test(insPeriod))?insPeriod.slice(5,7):cur.slice(5,7);insPeriod=y+'-'+mm;}
   insScopeV=s;renderInsights();
@@ -1418,15 +1421,22 @@ async function cloudInsertBook(b){const {error}=await supa.from('books').insert(
 async function cloudUpdateBookMeta(id,name,emoji,kind){const {error}=await supa.from('books').update({name,emoji:emoji||null,kind:kind||null}).eq('id',id);if(error)cloudWarn(error);}
 function cloudWarn(error){console.error(error);toast('Sync error — check connection');}
 async function cloudSignOut(){try{await supa.auth.signOut();}catch(e){}location.reload();}
+function cloudFetchFallback(){try{const s=localStorage.getItem(KEY);if(s)books=JSON.parse(s);}catch(_){}if(!books)books=JSON.parse(JSON.stringify(DEFAULT_BOOKS));}
 async function cloudFetch(){
-  const [r1,r2]=await Promise.all([
-    supa.from('books').select('*').order('sort',{ascending:true}),
-    supa.from('expenses').select('*')
-  ]);
-  if(r1.error||r2.error){console.error(r1.error||r2.error);try{const s=localStorage.getItem(KEY);if(s)books=JSON.parse(s);}catch(_){}if(!books)books=JSON.parse(JSON.stringify(DEFAULT_BOOKS));return;}
+  const r1=await supa.from('books').select('*').order('sort',{ascending:true});
+  if(r1.error){console.error(r1.error);cloudFetchFallback();return;}
+  // Supabase/PostgREST returns at most ~1000 rows per request — page through ALL expenses
+  const PAGE=1000;let allRows=[],from=0;
+  while(true){
+    const re=await supa.from('expenses').select('*').order('date',{ascending:false}).range(from,from+PAGE-1);
+    if(re.error){console.error(re.error);cloudFetchFallback();return;}
+    const batch=re.data||[];allRows=allRows.concat(batch);
+    if(batch.length<PAGE)break;
+    from+=PAGE;
+  }
   const map={};
   books=(r1.data||[]).map(b=>{const bk={id:b.id,name:b.name,type:b.type,members:b.members,emoji:b.emoji||null,kind:b.kind||null,items:[]};map[b.id]=bk;return bk;});
-  (r2.data||[]).forEach(r=>{const bk=map[r.book_id];if(!bk)return;bk.items.push(fromRow(r));});
+  allRows.forEach(r=>{const bk=map[r.book_id];if(!bk)return;bk.items.push(fromRow(r));});
   if(!books.length)books=JSON.parse(JSON.stringify(DEFAULT_BOOKS));
   try{localStorage.setItem(KEY,JSON.stringify(books));}catch(_){}
 }
