@@ -373,13 +373,16 @@ let tT;
 function toast(m,isErr){const t=document.getElementById('toast');t.textContent=m;t.className='toast show'+(isErr?' err':'');clearTimeout(tT);tT=setTimeout(()=>t.className='toast',2600);}
 
 /* ---------- boot / auth ---------- */
+// Supabase/PostgREST returns at most ~1000 rows per request: page through EVERY read.
+// `orders` must end with a unique column (id) so pages never overlap or skip rows on ties.
+async function fetchAllRows(table,cols,orders){const PAGE=1000;let all=[],from=0;while(true){let q=supa.from(table).select(cols);orders.forEach(([c,asc])=>{q=q.order(c,{ascending:asc});});const r=await q.range(from,from+PAGE-1);if(r.error)return {data:null,error:r.error};const d=r.data||[];all=all.concat(d);if(d.length<PAGE)break;from+=PAGE;}return {data:all,error:null};}
 async function fetchBooks(){
-  const {data,error}=await supa.from('books').select('*').order('sort',{ascending:true});
+  const {data,error}=await fetchAllRows('books','*',[['sort',true],['id',true]]);
   if(error){console.error(error);toast('Could not load books',true);return;}
   books=(data||[]).map(b=>({id:b.id,name:b.name,type:b.type,members:b.members}));
 }
 async function fetchExisting(){
-  const {data,error}=await supa.from('expenses').select('book_id,date,amount,description,category,kind');
+  const {data,error}=await fetchAllRows('expenses','id,book_id,date,amount,description,category,kind',[['date',false],['id',true]]);
   if(error){console.error(error);return;} // dedupe just won't flag if this fails
   existing=(data||[]).filter(r=>r.kind!=='transfer');
   existingByAmt={};

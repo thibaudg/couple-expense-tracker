@@ -483,7 +483,7 @@
 
 <script>
 /* ---------- app version (bump on each shipped build; see CHANGELOG.md) ---------- */
-const APP_VERSION='1.3.2';
+const APP_VERSION='1.3.5';
 /* ---------- cloud config ---------- */
 const SUPABASE_URL='https://uhbfcrajquihzkdbeooo.supabase.co';          // <-- paste your Supabase Project URL
 const SUPABASE_ANON_KEY='sb_publishable_5cOEagITv7fEtmJTKqcEmQ_f4KfNYcP';  // Supabase publishable (public) key     // <-- paste your Supabase anon public key
@@ -1216,7 +1216,7 @@ function openIdentityPicker(isChange){
   document.body.appendChild(mkSheet(html));
 }
 async function pickIdentity(name){
-  me=name;insPerson=name;saveCur();
+  me=name;insPerson=name;saveCur();try{localStorage.setItem('expenses_me',name);}catch(_){}
   if(CLOUD){try{await supa.auth.updateUser({data:{name}});}catch(e){}}
   closePicker();renderAll();renderDraft();
 }
@@ -1414,29 +1414,74 @@ document.getElementById('name-input').addEventListener('keydown',e=>{if(e.key===
 /* ---------- cloud sync ---------- */
 function toRow(item,bookId){return {id:item.id,book_id:bookId,date:item.date,description:item.desc||null,category:item.cat||null,amount:item.amount,paid_by:(item.paidBy||item.from)||null,split:item.split||null,shares:item.shares||null,kind:item.kind||'expense',to_member:item.to||null};}
 function fromRow(r){if(r.kind==='transfer')return {id:r.id,kind:'transfer',date:r.date,from:r.paid_by,to:r.to_member,amount:Number(r.amount),desc:r.description};const it={id:r.id,kind:(r.kind==='income'?'income':'expense'),date:r.date,desc:r.description,cat:r.category,amount:Number(r.amount),paidBy:r.paid_by,split:r.split};if(r.shares)it.shares=r.shares;return it;}
-async function cloudInsertExpense(item,bookId){const {error}=await supa.from('expenses').insert(toRow(item,bookId));if(error)cloudWarn(error);}
-async function cloudUpsertExpense(item,bookId){const {error}=await supa.from('expenses').update(toRow(item,bookId||curId)).eq('id',item.id);if(error)cloudWarn(error);}
-async function cloudDeleteExpense(id){const {error}=await supa.from('expenses').delete().eq('id',id);if(error)cloudWarn(error);}
-async function cloudInsertBook(b){const {error}=await supa.from('books').insert({id:b.id,name:b.name,type:b.type,members:b.members,emoji:b.emoji||null,kind:b.kind||null,sort:Date.now()});if(error)cloudWarn(error);}
-async function cloudUpdateBookMeta(id,name,emoji,kind){const {error}=await supa.from('books').update({name,emoji:emoji||null,kind:kind||null}).eq('id',id);if(error)cloudWarn(error);}
+/* Outbox: every write is queued in localStorage first, then sent in order. If the phone is
+   offline (or Supabase is unreachable) the change stays queued and is retried on the next
+   sync, instead of being silently overwritten by the next fetch. Expense writes are
+   idempotent upserts keyed by id, so a retry can never create a duplicate. (v1.3.4) */
+const OUTBOX_KEY='expenses_outbox';
+function obLoad(){try{return JSON.parse(localStorage.getItem(OUTBOX_KEY)||'[]');}catch(_){return [];}}
+function obSave(q){try{localStorage.setItem(OUTBOX_KEY,JSON.stringify(q));}catch(_){}}
+function obPending(){return obLoad().length;}
+let obBusy=false;
+async function obSend(op){
+  if(op.t==='upsert')return supa.from(op.table).upsert(op.row);
+  if(op.t==='update')return supa.from(op.table).update(op.patch).eq('id',op.id);
+  if(op.t==='delete')return supa.from(op.table).delete().eq('id',op.id);
+  return {error:null};
+}
+// A Postgres error code (e.g. 23503) means the server rejected the change itself: retrying
+// won't help, so drop it and tell the user. Anything else (no code) = network → keep & retry.
+function obRejected(error){return !!(error&&error.code&&/^[0-9A-Z]{5}$/.test(error.code));}
+async function flushOutbox(){
+  if(obBusy||!supa)return;obBusy=true;
+  try{
+    while(true){
+      const q=obLoad();if(!q.length)break;
+      let res;try{res=await obSend(q[0]);}catch(e){res={error:{message:String(e)}};}
+      if(res&&res.error){
+        if(obRejected(res.error)){console.error(res.error);obSave(obLoad().slice(1));toast('A change was rejected by the server and not saved');continue;}
+        console.warn('Offline — change kept on this phone',res.error);break;
+      }
+      obSave(obLoad().slice(1));
+    }
+  }finally{obBusy=false;}
+}
+function obQueue(op){const q=obLoad();q.push(op);obSave(q);if(navigator.onLine===false)setTimeout(()=>toast('Offline — saved on this phone, will sync'),900);flushOutbox().then(()=>{if(obPending())toast('Offline — saved on this phone, will sync');});}
+// Re-apply still-queued changes on top of freshly fetched data so they stay visible.
+function obApplyPending(map){
+  obLoad().forEach(op=>{
+    if(op.table==='books'){
+      if(op.t==='upsert'&&!map[op.row.id]){const r=op.row;const bk={id:r.id,name:r.name,type:r.type,members:r.members,emoji:r.emoji||null,kind:r.kind||null,items:[]};map[r.id]=bk;books.push(bk);}
+      if(op.t==='update'&&map[op.id])Object.assign(map[op.id],op.patch);
+      return;
+    }
+    const id=op.t==='upsert'?op.row.id:op.id;
+    books.forEach(b=>{const i=b.items.findIndex(x=>x.id===id);if(i>=0)b.items.splice(i,1);});
+    if(op.t==='upsert'&&map[op.row.book_id])map[op.row.book_id].items.push(fromRow(op.row));
+  });
+}
+async function cloudInsertExpense(item,bookId){obQueue({table:'expenses',t:'upsert',row:toRow(item,bookId)});}
+async function cloudUpsertExpense(item,bookId){obQueue({table:'expenses',t:'upsert',row:toRow(item,bookId||curId)});}
+async function cloudDeleteExpense(id){obQueue({table:'expenses',t:'delete',id});}
+async function cloudInsertBook(b){obQueue({table:'books',t:'upsert',row:{id:b.id,name:b.name,type:b.type,members:b.members,emoji:b.emoji||null,kind:b.kind||null,sort:Date.now()}});}
+async function cloudUpdateBookMeta(id,name,emoji,kind){obQueue({table:'books',t:'update',id,patch:{name,emoji:emoji||null,kind:kind||null}});}
 function cloudWarn(error){console.error(error);toast('Sync error — check connection');}
-async function cloudSignOut(){try{await supa.auth.signOut();}catch(e){}location.reload();}
-function cloudFetchFallback(){try{const s=localStorage.getItem(KEY);if(s)books=JSON.parse(s);}catch(_){}if(!books)books=JSON.parse(JSON.stringify(DEFAULT_BOOKS));}
+async function cloudSignOut(){try{await supa.auth.signOut();}catch(e){}try{localStorage.removeItem('expenses_me');}catch(_){}location.reload();}
+function cloudFetchFallback(){try{const s=localStorage.getItem(KEY);if(s)books=JSON.parse(s);}catch(_){}if(!books)books=JSON.parse(JSON.stringify(DEFAULT_BOOKS));const map={};books.forEach(b=>{map[b.id]=b;});obApplyPending(map);}
+// Supabase/PostgREST returns at most ~1000 rows per request: page through EVERY read.
+// `orders` must end with a unique column (id) so pages never overlap or skip rows on ties.
+async function fetchAllRows(table,cols,orders){const PAGE=1000;let all=[],from=0;while(true){let q=supa.from(table).select(cols);orders.forEach(([c,asc])=>{q=q.order(c,{ascending:asc});});const r=await q.range(from,from+PAGE-1);if(r.error)return {data:null,error:r.error};const d=r.data||[];all=all.concat(d);if(d.length<PAGE)break;from+=PAGE;}return {data:all,error:null};}
 async function cloudFetch(){
-  const r1=await supa.from('books').select('*').order('sort',{ascending:true});
+  await flushOutbox();
+  const r1=await fetchAllRows('books','*',[['sort',true],['id',true]]);
   if(r1.error){console.error(r1.error);cloudFetchFallback();return;}
-  // Supabase/PostgREST returns at most ~1000 rows per request — page through ALL expenses
-  const PAGE=1000;let allRows=[],from=0;
-  while(true){
-    const re=await supa.from('expenses').select('*').order('date',{ascending:false}).range(from,from+PAGE-1);
-    if(re.error){console.error(re.error);cloudFetchFallback();return;}
-    const batch=re.data||[];allRows=allRows.concat(batch);
-    if(batch.length<PAGE)break;
-    from+=PAGE;
-  }
+  const re=await fetchAllRows('expenses','*',[['date',false],['id',true]]);
+  if(re.error){console.error(re.error);cloudFetchFallback();return;}
+  const allRows=re.data;
   const map={};
   books=(r1.data||[]).map(b=>{const bk={id:b.id,name:b.name,type:b.type,members:b.members,emoji:b.emoji||null,kind:b.kind||null,items:[]};map[b.id]=bk;return bk;});
   allRows.forEach(r=>{const bk=map[r.book_id];if(!bk)return;bk.items.push(fromRow(r));});
+  obApplyPending(map);
   if(!books.length)books=JSON.parse(JSON.stringify(DEFAULT_BOOKS));
   try{localStorage.setItem(KEY,JSON.stringify(books));}catch(_){}
 }
@@ -1447,18 +1492,39 @@ function subscribeRealtime(){
     .on('postgres_changes',{event:'*',schema:'public',table:'books'},queueRefetch)
     .subscribe();
 }
+window.addEventListener('online',()=>{if(CLOUD&&supa)queueRefetch();});
+document.addEventListener('visibilitychange',()=>{if(CLOUD&&supa&&document.visibilityState==='visible'&&obPending())queueRefetch();});
 function queueRefetch(){clearTimeout(rtTimer);rtTimer=setTimeout(async()=>{const kc=curId;await cloudFetch();curId=books.some(b=>b.id===kc)?kc:(books[0]&&books[0].id);renderAll();},250);}
 async function resolveIdentity(){
-  try{const {data}=await supa.auth.getUser();authEmail=data&&data.user?data.user.email:null;
-    const nm=data&&data.user&&data.user.user_metadata?data.user.user_metadata.name:null;
-    if(nm&&PEOPLE.includes(nm))me=nm;else return false;}catch(e){return false;}
-  return true;
+  // Offline-safe: getUser() needs the network, so fall back to the session stored on the
+  // phone, then to the last person who used this phone (v1.3.5).
+  const cached=(()=>{try{return localStorage.getItem('expenses_me');}catch(_){return null;}})();
+  let user=null;
+  try{const {data}=await supa.auth.getUser();user=data&&data.user;}catch(e){}
+  if(!user){try{const {data}=await supa.auth.getSession();user=data&&data.session&&data.session.user;}catch(e){}}
+  if(user)authEmail=user.email||authEmail;
+  const nm=user&&user.user_metadata?user.user_metadata.name:null;
+  if(nm&&PEOPLE.includes(nm)){me=nm;try{localStorage.setItem('expenses_me',nm);}catch(_){}return true;}
+  if(cached&&PEOPLE.includes(cached)){me=cached;return true;}
+  return false;
 }
+let fastBooted=false;   // UI already shown from this phone's saved copy (v1.3.5)
 async function cloudBoot(){
-  await cloudFetch();restoreCur();
+  const kc=curId;
+  await cloudFetch();
+  if(fastBooted)curId=books.some(b=>b.id===kc)?kc:(books[0]&&books[0].id);else restoreCur();
   const known=await resolveIdentity();          // login → person via display name
-  insPerson=me;newDraft();renderDraft();renderAppbar();go('add');subscribeRealtime();
+  if(fastBooted){renderAppbar();renderAll();}   // keep the screen + any half-typed entry
+  else{insPerson=me;newDraft();renderDraft();renderAppbar();go('add');}
+  subscribeRealtime();
   if(!known)openIdentityPicker(false);          // first run for this login: pick once
+}
+// Instant start: show the copy saved on this phone right away, then sync in the background.
+// Without this, an offline start waits ~30 s while Supabase retries the token refresh.
+function fastBoot(){
+  cloudFetchFallback();restoreCur();
+  try{const c=localStorage.getItem('expenses_me');if(c&&PEOPLE.includes(c))me=c;}catch(_){}
+  insPerson=me;newDraft();renderDraft();renderAppbar();go('add');fastBooted=true;
 }
 function showLogin(){document.getElementById('login').classList.remove('hidden');}
 function hideLogin(){document.getElementById('login').classList.add('hidden');}
@@ -1473,11 +1539,20 @@ async function doLogin(e){
   if(error){err.textContent=error.message;return;}
   hideLogin();await cloudBoot();
 }
+function hasStoredLogin(){try{return Object.keys(localStorage).some(k=>/^sb-.*-auth-token$/.test(k));}catch(_){return false;}}
 async function initCloud(){
   if(!supa){alert('Could not load the Supabase library (are you offline?).');return;}
-  const {data}=await supa.auth.getSession();
-  if(data&&data.session){await cloudBoot();}else{showLogin();}
+  if(hasStoredLogin())fastBoot();
+  let session=null;try{const {data}=await supa.auth.getSession();session=data&&data.session;}catch(e){}
+  // Offline with an expired token, getSession() can come back empty even though this phone
+  // is still logged in (the token just couldn't be refreshed). If a login is stored, boot
+  // from the local copy; Supabase refreshes the token once the connection is back (v1.3.5).
+  if(session||hasStoredLogin()){await cloudBoot();}else{showLogin();}
 }
+// Register the service worker so the app can open without a connection (v1.3.5).
+if('serviceWorker' in navigator&&location.protocol!=='file:'){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW registration failed',e));});}
+// Retry queued changes every 30 s while any are pending (e.g. waiting for a token refresh).
+setInterval(()=>{if(CLOUD&&supa&&obPending())flushOutbox();},30000);
 
 /* ---------- boot ---------- */
 if(CLOUD){ initCloud(); }
